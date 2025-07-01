@@ -14,6 +14,7 @@ import Feedback from "@/pages/FeedBack";
 import Team from "@/pages/Team";
 import Careers from "@/pages/Careers";
 import ForgotPassword from "@/pages/ForgotPassword";
+import Test from "@/pages/Test";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -31,6 +32,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/sign-in" element={<SignIn />}></Route>
       <Route path="/sign-up" element={<SignUp />}></Route>
       <Route path="/forgot" element={<ForgotPassword />}></Route>
+      <Route path="/test" element={<Test />}></Route>
       <Route path="*" element={<NotFound />}></Route>
     </Routes>
   );

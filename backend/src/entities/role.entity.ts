@@ -11,6 +11,7 @@ import {
 import UserRole from './userRole.entity';
 import { RoleCode } from 'src/shared/enums/roleCode';
 import { RoleName } from 'src/shared/enums/roleName';
+import RolePermission from './rolePermission.entity';
 
 @Entity('roles')
 export default class Role {
@@ -40,6 +41,9 @@ export default class Role {
 
   @OneToMany(() => UserRole, (ur) => ur.role)
   users: UserRole[];
+
+  @OneToMany(() => RolePermission, (rp) => rp)
+  permissions: RolePermission[];
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

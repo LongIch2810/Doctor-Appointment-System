@@ -31,7 +31,7 @@ export default class DoctorSchedule {
   end_time: string;
 
   @Column({ default: true })
-  isActive: boolean;
+  is_active: boolean;
 
   @ManyToOne(() => Doctor, (d) => d.doctor_schedules)
   @JoinColumn({ name: 'doctor_id' })

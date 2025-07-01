@@ -10,15 +10,7 @@ import {
 import { Button } from "../ui/button";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Menu, X, XIcon } from "lucide-react";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const header_items = [
   {
