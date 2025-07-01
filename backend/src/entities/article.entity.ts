@@ -35,7 +35,7 @@ export default class Article {
   slug: string;
 
   @Column({ default: false })
-  isApprove: boolean;
+  is_approve: boolean;
 
   @ManyToOne(() => Topic, (t) => t.articles)
   @JoinColumn({ name: 'topic_id' })

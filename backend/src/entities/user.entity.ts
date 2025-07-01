@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -16,6 +15,7 @@ import Article from './article.entity';
 import HealthProfile from './healthProfile.entity';
 import Doctor from './doctor.entity';
 import Appointment from './appointment.entity';
+import Conversation from './conversation.entity';
 
 @Entity('users')
 export default class User {
@@ -41,7 +41,7 @@ export default class User {
   gender: boolean;
 
   @Column({ nullable: true })
-  dateOfBirth: Date;
+  date_of_birth: Date;
 
   @Column({ nullable: true })
   picture: string;
@@ -72,6 +72,9 @@ export default class User {
 
   @OneToMany(() => Appointment, (ap) => ap.patient)
   appointments: Appointment[];
+
+  @OneToMany(() => Conversation, (c) => c.user)
+  messages: Conversation[];
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
