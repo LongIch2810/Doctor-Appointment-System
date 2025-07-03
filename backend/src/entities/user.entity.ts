@@ -16,6 +16,7 @@ import HealthProfile from './healthProfile.entity';
 import Doctor from './doctor.entity';
 import Appointment from './appointment.entity';
 import Conversation from './conversation.entity';
+import Otp from './otp.entity';
 
 @Entity('users')
 export default class User {
@@ -28,7 +29,7 @@ export default class User {
   @Column({ unique: true, nullable: false })
   email: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   password: string;
 
   @Column({ unique: true, nullable: true })
@@ -75,6 +76,9 @@ export default class User {
 
   @OneToMany(() => Conversation, (c) => c.user)
   messages: Conversation[];
+
+  @OneToMany(() => Otp, (o) => o.user)
+  otps: Otp[];
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

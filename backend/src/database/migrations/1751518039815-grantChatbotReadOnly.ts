@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class GrantChatbotReadOnly1750941219507 implements MigrationInterface {
+export class GrantChatbotReadOnly1751518039815 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // 1. Tạo user nếu chưa tồn tại
     await queryRunner.query(`

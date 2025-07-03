@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class UpdateIdSequence1751103034298 implements MigrationInterface {
+export class UpdateIdSequence1751518047256 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       SELECT setval('article_tags_id_seq', (SELECT COALESCE(MAX(id), 0) FROM article_tags));
