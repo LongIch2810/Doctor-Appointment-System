@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class SeedData1750941174875 implements MigrationInterface {
+export class SeedData1751517995483 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     //Thêm dữ liệu về roles
     await queryRunner.query(`

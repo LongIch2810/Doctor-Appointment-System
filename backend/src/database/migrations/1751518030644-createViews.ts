@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateViews1750941193260 implements MigrationInterface {
+export class CreateViews1751518030644 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     //1.View:Danh sách bác sĩ
     await queryRunner.query(`

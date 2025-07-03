@@ -6,6 +6,12 @@
     "deleteOutDir": true,
     "watchOptions": {
       "poll": 1000
-    }
+    },
+    "assets": [
+      {
+        "include": "**/templates/**/*",
+        "outDir": "./dist"
+      }
+    ]
   }
 }

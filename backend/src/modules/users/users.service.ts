@@ -21,8 +21,30 @@ export class UsersService {
     return user;
   }
 
-  async createUser(username: string, email: string, password: string) {
-    const newUser = this.userRepo.create({ username, email, password });
-    return await this.userRepo.save(newUser);
+  async createUser(username: string, email: string, password: string | null) {
+    return password
+      ? await this.userRepo.save({
+          username,
+          email,
+          password,
+        })
+      : await this.userRepo.save({
+          username,
+          email,
+        });
+  }
+
+  async updateUserField(
+    userId: number,
+    updateFieldName: string,
+    updateFieldValue: any,
+  ) {
+    return this.userRepo.update(userId, {
+      [updateFieldName]: updateFieldValue,
+    });
+  }
+
+  async updateUserFields(userId: number, updateFields: Partial<User>) {
+    return this.userRepo.update(userId, updateFields);
   }
 }
