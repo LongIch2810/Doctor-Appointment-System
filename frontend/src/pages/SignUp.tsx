@@ -4,27 +4,37 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = z.object({
+  username: z.string().min(6, "Username tối thiểu 6 kí tự !"),
+  email: z.string().email("Email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu tối thiểu 6 kí tự !"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 const SignUp = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = async (data: FormData) => {
     setLoading(true);
 
     // Giả lập gọi API
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
-    if (username && email && password.length >= 6) {
+    if (data.username && data.email && data.password.length >= 6) {
       alert("Đăng ký thành công!");
-      // Redirect hoặc clear form tại đây nếu cần
-    } else {
-      setError("Vui lòng nhập đầy đủ thông tin hợp lệ.");
     }
 
     setLoading(false);
@@ -74,33 +84,43 @@ const SignUp = () => {
             </p>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <Input
-                type="text"
-                placeholder="Tên đăng nhập"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Input
-                type="password"
-                placeholder="Mật khẩu (tối thiểu 6 ký tự)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              {error && (
-                <p className="text-red-600 text-center text-sm font-medium">
-                  {error}
-                </p>
-              )}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div>
+                <Input
+                  type="text"
+                  placeholder="Tên đăng nhập"
+                  {...register("username")}
+                />
+                {errors.username && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.username.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  {...register("email")}
+                />
+                {errors.email && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Input
+                  type="password"
+                  placeholder="Mật khẩu"
+                  {...register("password")}
+                />
+                {errors.password && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
               <Button
                 type="submit"
                 className="w-full py-3 text-base"

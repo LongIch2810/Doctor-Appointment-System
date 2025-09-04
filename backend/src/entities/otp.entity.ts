@@ -12,7 +12,7 @@ export default class Otp {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   otpCode: string;
 
   @Column({ type: 'timestamp' })

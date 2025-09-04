@@ -1,0 +1,16 @@
+export const removePasswordDeep = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map(removePasswordDeep);
+  } else if (obj && typeof obj === 'object') {
+    const { password, ...rest } = obj;
+    for (const key in rest) {
+      if (rest[key] && typeof rest[key]) {
+        rest[key] = removePasswordDeep(rest[key]);
+      }
+    }
+
+    return rest;
+  }
+
+  return obj;
+};

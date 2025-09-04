@@ -19,6 +19,9 @@ export default class Specialty {
   @Column({ unique: true, nullable: false })
   name: string;
 
+  @Column({ unique: true, nullable: false })
+  slug: string;
+
   @Column({ nullable: false })
   description: string;
 

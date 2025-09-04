@@ -17,6 +17,9 @@ import Doctor from './doctor.entity';
 import Appointment from './appointment.entity';
 import Conversation from './conversation.entity';
 import Otp from './otp.entity';
+import Message from './message.entity';
+import Participants from './participants.entity';
+import Complaint from './complaint.entity';
 
 @Entity('users')
 export default class User {
@@ -79,6 +82,15 @@ export default class User {
 
   @OneToMany(() => Otp, (o) => o.user)
   otps: Otp[];
+
+  @OneToMany(() => Message, (m) => m.sender)
+  chat_messages: Message[];
+
+  @OneToMany(() => Participants, (p) => p.user)
+  channels: Participants[];
+
+  @OneToMany(() => Complaint, (c) => c.user)
+  complaints: Complaint[];
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

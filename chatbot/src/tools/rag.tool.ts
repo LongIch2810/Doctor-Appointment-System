@@ -12,22 +12,24 @@ export const ragTool = tool(
   {
     name: "rag_tool",
     description: `
-Use this tool to answer user questions related to clinic operations, including internal regulations, procedures, and available medical services. 
-It retrieves and summarizes relevant information from internal documents stored in a vector database using Retrieval-Augmented Generation (RAG).
+Sử dụng công cụ này để trả lời các câu hỏi liên quan đến hoạt động của phòng khám, bao gồm quy định nội bộ, quy trình và các dịch vụ y tế hiện có. 
+Công cụ sẽ truy xuất và tóm tắt thông tin liên quan từ các tài liệu nội bộ được lưu trữ trong cơ sở dữ liệu vector thông qua kỹ thuật RAG (Truy xuất kết hợp sinh văn bản).
 
-This tool is ideal for:
-- Answering questions about clinic policies or service guidelines.
-- Providing details from onboarding materials or internal documentation.
-- Clarifying procedures, roles, or rules defined within the organization.
+Công cụ này phù hợp để:
+- Trả lời câu hỏi về chính sách, hướng dẫn dịch vụ của phòng khám.
+- Cung cấp thông tin từ tài liệu onboarding hoặc tài liệu nội bộ.
+- Làm rõ quy trình, vai trò, hoặc quy định trong tổ chức.
 
-Do **not** use this tool for general knowledge, database statistics, or structured data queries — use the appropriate SQL tool instead in those cases.
+Không sử dụng công cụ này cho các câu hỏi kiến thức chung, thống kê cơ sở dữ liệu, hoặc truy vấn dữ liệu có cấu trúc — hãy sử dụng công cụ SQL phù hợp trong những trường hợp đó.
 
-📌 The response will be automatically generated in the **same language** as the user's question (e.g., English, Vietnamese, etc.), ensuring consistent and natural communication.
+Phản hồi sẽ được tự động tạo ra bằng chính ngôn ngữ của câu hỏi người dùng (ví dụ: tiếng Việt, tiếng Anh, v.v...) để đảm bảo giao tiếp tự nhiên và nhất quán.
 `,
     schema: z.object({
       question: z
         .string()
-        .describe("Câu hỏi của người dùng về dịch vụ y tế hoặc nội quy."),
+        .describe(
+          "Câu hỏi của người dùng liên quan đến dịch vụ y tế hoặc quy định nội bộ."
+        ),
     }),
   }
 );

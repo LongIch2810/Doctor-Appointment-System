@@ -3,9 +3,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailProducer } from './queues/email/email.producer';
 import { EmailProcessor } from './queues/email/email.processor';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
+    MailModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

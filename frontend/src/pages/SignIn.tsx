@@ -5,25 +5,43 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa";
 import { Typewriter } from "react-simple-typewriter";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = z.object({
+  usernameOrEmail: z
+    .string()
+    .min(6, "Phải có ít nhất 6 kí tự !")
+    .refine(
+      (val) =>
+        val.includes("@") ? /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(val) : true,
+      {
+        message: "Email không hợp lệ !",
+      }
+    ),
+  password: z.string().min(6, "Mật khẩu tối thiểu 6 kí tự !"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 const SignIn = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({ resolver: zodResolver(schema) });
+
+  const onSubmit = async (data: FormData) => {
     setLoading(true);
 
     // Giả lập API
     await new Promise((r) => setTimeout(r, 1200));
 
-    if (username === "admin" && password === "123456") {
+    if (data.usernameOrEmail === "admin" && data.password === "123456") {
       alert("Đăng nhập thành công!");
-    } else {
-      setError("Tên đăng nhập hoặc mật khẩu không đúng");
     }
 
     setLoading(false);
@@ -73,28 +91,31 @@ const SignIn = () => {
             </p>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <Input
-                type="text"
-                placeholder="Tên đăng nhập hoặc email"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="text-base"
-              />
-              <Input
-                type="password"
-                placeholder="Mật khẩu"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="text-base"
-              />
-              {error && (
-                <p className="text-red-600 text-center text-sm font-medium">
-                  {error}
-                </p>
-              )}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div>
+                <Input
+                  type="text"
+                  placeholder="Tên đăng nhập hoặc email"
+                  {...register("usernameOrEmail")}
+                />
+                {errors.usernameOrEmail && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.usernameOrEmail.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <Input
+                  type="password"
+                  placeholder="Mật khẩu"
+                  {...register("password")}
+                />
+                {errors.password && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
               <div className="flex justify-between text-sm text-gray-500">
                 <Link to="/forgot-password" className="hover:underline">
                   Quên mật khẩu?

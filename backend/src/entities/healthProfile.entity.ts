@@ -15,62 +15,62 @@ export default class HealthProfile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   weight: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   height: number;
 
   //Nhóm máu
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   blood_type: string;
 
   //Bệnh nền
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   medical_history: string;
 
   //Dị ứng
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   allergies: string;
 
   //Nhịp tim
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   heart_rate: number;
 
   //Huyết áp
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   blood_pressure: string;
 
   //Lượng đường huyết (mg/dL)
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   glucose_level: number;
 
   //Mức cholesterol (mg/dL)
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   cholesterol_level: number;
 
   //Thuốc đang sử dụng
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   medications: string;
 
   //Các mũi vac xin đã tiêm
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   vaccinations: string;
 
   //Có hút thuốc không ?
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   smoking: boolean;
 
   //Có uống rượu hoặc bia không
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   alcohol_consumption: boolean;
 
   //Tần suất vận động
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   exercise_frequency: string;
 
   //Ngày khám gần nhất
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   last_checkup_date: Date;
 
   @OneToOne(() => User, (u) => u.health_profile)
