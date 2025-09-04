@@ -6,13 +6,13 @@ const handleChatController = async (
   req: Request,
   res: Response
 ): Promise<any> => {
-  const { question }: ChatInput = req.body;
+  const { question, userId, token }: ChatInput = req.body;
   if (!question) {
     return res
       .status(400)
       .json({ success: false, message: "Question is required." });
   }
-  const result = await handleChatService({ question });
+  const result = await handleChatService({ question, userId, token });
   return result.SC === 200 && result?.answer
     ? res.status(200).json({ success: true, answer: result.answer })
     : res.status(result.SC).json({ success: false, err: result.err });

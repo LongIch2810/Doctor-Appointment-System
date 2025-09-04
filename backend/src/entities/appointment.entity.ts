@@ -14,7 +14,7 @@ import User from './user.entity';
 import ExaminationResult from './examinationResult.entity';
 import SatisfactionRating from './satisfactionRating.entity';
 import { AppointmentStatus } from 'src/shared/enums/appointmentStatus';
-import { PaymentStatus } from 'src/shared/enums/paymentStatus';
+import DoctorSchedule from './doctorSchedule.entity';
 
 @Entity('appointments')
 export default class Appointment {
@@ -32,22 +32,9 @@ export default class Appointment {
   })
   status: AppointmentStatus;
 
-  @Column({
-    type: 'enum',
-    default: PaymentStatus.UNPAID,
-    enumName: 'payment_status',
-    enum: PaymentStatus,
-  })
-  payment_status: PaymentStatus;
-
-  @Column({ nullable: false })
-  fee: number;
-
-  @Column({ nullable: false })
-  deposit_amount: number;
-
-  @Column({ nullable: false })
-  remaining_amount: number;
+  @ManyToOne(() => DoctorSchedule, (ds) => ds.appointments, { nullable: false })
+  @JoinColumn({ name: 'doctor_schedule_id' })
+  doctor_schedule: DoctorSchedule;
 
   @ManyToOne(() => Doctor, (d) => d.appointments)
   @JoinColumn({ name: 'doctor_id' })

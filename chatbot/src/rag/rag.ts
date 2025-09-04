@@ -9,7 +9,7 @@ import initVectorDB from "../configs/vectordb.js";
 
 async function setupRagGraph() {
   const llm = new ChatGoogleGenerativeAI({
-    model: "gemini-2.5-flash",
+    model: "gemini-2.5-pro",
     temperature: 0,
     apiKey: process.env.GOOGLE_API_KEY,
   });

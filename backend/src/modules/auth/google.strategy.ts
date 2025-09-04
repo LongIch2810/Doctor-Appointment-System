@@ -3,12 +3,14 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { UsersService } from '../users/users.service';
+import { HealthProfileService } from '../health-profile/health-profile.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     configService: ConfigService,
     private usersService: UsersService,
+    private healthProfileService: HealthProfileService,
   ) {
     super({
       clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
@@ -39,6 +41,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
     const newUser = await this.usersService.createUser(username, email, null);
     await this.usersService.updateUserField(newUser.id, 'picture', picture);
+    await this.healthProfileService.createHealthProfile(newUser.id);
 
     return done(null, newUser);
   }

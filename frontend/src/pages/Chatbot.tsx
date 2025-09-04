@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Message = {
   id: number;
@@ -59,7 +59,11 @@ export default function ChatbotPage() {
             }`}
           >
             {!fromUser && (
-              <Avatar>
+              <Avatar title="ChatbotMedicalAssistant">
+                <AvatarImage
+                  src="https://cdn.dribbble.com/userupload/2798814/file/original-3cfdbabadfd8f92aed97b0c0b57c6b89.png?resize=1600x1200&vertical=center"
+                  alt="ChatbotMedicalAssistant"
+                />
                 <AvatarFallback>🤖</AvatarFallback>
               </Avatar>
             )}

@@ -2,7 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MainLayout from "@/layouts/MainLayout";
 import FilterItem from "../components/item/FilterItem";
-import { CalendarCheck, MapPin, Stethoscope, Search } from "lucide-react";
+import {
+  CalendarCheck,
+  MapPin,
+  Stethoscope,
+  Search,
+  Briefcase,
+} from "lucide-react";
 import type { DoctorProps } from "@/types/global";
 import DoctorCard from "@/components/card/DoctorCard";
 
@@ -87,6 +93,22 @@ const doctors: DoctorProps[] = [
     experience: 5,
     hospital: "Bệnh viên CuBa",
   },
+  {
+    name: "Dr. Adam Woods",
+    avatar:
+      "https://plus.unsplash.com/premium_photo-1681996484614-6afde0d53071?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    specialty: "Da liễu",
+    experience: 5,
+    hospital: "Bệnh viên CuBa",
+  },
+  {
+    name: "Dr. Adam Woods",
+    avatar:
+      "https://plus.unsplash.com/premium_photo-1681996484614-6afde0d53071?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    specialty: "Da liễu",
+    experience: 5,
+    hospital: "Bệnh viên CuBa",
+  },
 ];
 
 const Doctor = () => {
@@ -111,19 +133,24 @@ const Doctor = () => {
               onClick={() => console.log("Clicked chuyên khoa")}
             />
             <FilterItem
-              label="Khu vực"
-              icon={<MapPin size={16} />}
-              onClick={() => console.log("Clicked khu vực")}
-            />
-            <FilterItem
               label="Năm kinh nghiệm"
               icon={<CalendarCheck size={16} />}
               onClick={() => console.log("Clicked kinh nghiệm")}
             />
+            <FilterItem
+              label="Nơi làm việc"
+              icon={<Briefcase size={16} />}
+              onClick={() => console.log("Clicked kinh nghiệm")}
+            />
+            <FilterItem
+              label="Khu vực"
+              icon={<MapPin size={16} />}
+              onClick={() => console.log("Clicked khu vực")}
+            />
           </div>
         </header>
         <div className="mt-10 md:mt-20">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4   justify-items-center gap-20">
             {doctors.map((item, index) => (
               <DoctorCard key={index} doctorProps={item} />
             ))}

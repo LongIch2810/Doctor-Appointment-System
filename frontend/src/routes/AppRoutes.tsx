@@ -31,7 +31,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/careers" element={<Careers />}></Route>
       <Route path="/sign-in" element={<SignIn />}></Route>
       <Route path="/sign-up" element={<SignUp />}></Route>
-      <Route path="/forgot" element={<ForgotPassword />}></Route>
+      <Route path="/forgot-password" element={<ForgotPassword />}></Route>
       <Route path="/test" element={<Test />}></Route>
       <Route path="*" element={<NotFound />}></Route>
     </Routes>

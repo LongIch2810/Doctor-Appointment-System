@@ -11,7 +11,6 @@ import {
 } from 'typeorm';
 import Topic from './topic.entity';
 import ArticleTag from './articleTag.entity';
-import Tag from './tag.entity';
 import User from './user.entity';
 
 @Entity('articles')
@@ -25,8 +24,11 @@ export default class Article {
   @Column({ nullable: false })
   content: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   img_url: string;
+
+  @Column({ nullable: true })
+  img_public_id: string;
 
   @Column({ nullable: false })
   summary: string;
@@ -42,7 +44,7 @@ export default class Article {
   topic: Topic;
 
   @OneToMany(() => ArticleTag, (at) => at.article)
-  tags: Tag[];
+  tags: ArticleTag[];
 
   @ManyToOne(() => User, (u) => u.articles)
   @JoinColumn({ name: 'author_id' })

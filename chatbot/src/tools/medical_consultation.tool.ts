@@ -7,7 +7,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 dotenv.config();
 
 const medicalLLM = new ChatGoogleGenerativeAI({
-  model: "gemini-2.0-flash",
+  model: "gemini-2.5-flash",
   apiKey: process.env.GOOGLE_API_KEY,
   temperature: 0.3,
 });
@@ -20,19 +20,22 @@ export const medicalConsultationTool = tool(
   {
     name: "medical_consultation_tool",
     description: `
-Use this tool to provide general medical and healthcare-related guidance. It is designed to generate informative responses based on public medical knowledge, covering topics such as:
+Sử dụng công cụ này để cung cấp thông tin tư vấn chung liên quan đến y tế và sức khỏe. 
+Công cụ được thiết kế để đưa ra các phản hồi mang tính chất tham khảo dựa trên kiến thức y khoa phổ thông, bao gồm các chủ đề như:
 
-- Common symptoms and possible conditions
-- Over-the-counter or prescription medications
-- Health tips, wellness, and self-care advice
-- Explanations of medical terminology or procedures
+- Các triệu chứng phổ biến và những tình trạng có thể gặp
+- Thông tin về thuốc không kê đơn hoặc thuốc kê đơn
+- Lời khuyên về chăm sóc sức khỏe, lối sống lành mạnh và phòng bệnh
+- Giải thích các thuật ngữ hoặc quy trình y tế
 
-⚠️ This tool is intended for informational purposes only and does **not** replace professional medical advice, diagnosis, or treatment. It does **not** access internal clinic databases or documents. For structured data (e.g., number of doctors) or internal policies, use the appropriate SQL or RAG tool.
+Lưu ý: Công cụ này chỉ mang tính chất tham khảo và **không thay thế cho chẩn đoán, điều trị hoặc tư vấn từ bác sĩ chuyên môn**. 
+Công cụ **không** truy cập vào bất kỳ cơ sở dữ liệu nội bộ hoặc tài liệu của phòng khám. 
+Đối với các câu hỏi liên quan đến dữ liệu có cấu trúc (ví dụ: số lượng bác sĩ) hoặc chính sách nội bộ, hãy sử dụng công cụ SQL hoặc RAG phù hợp.
 
-📌 The response will be automatically generated in the **same language** as the user's question (e.g., English, Vietnamese, etc.) to ensure clarity and natural understanding.
+Phản hồi sẽ được tạo ra **theo đúng ngôn ngữ của câu hỏi người dùng** (ví dụ: tiếng Việt, tiếng Anh) để đảm bảo rõ ràng và dễ hiểu.
 
-👉 Whenever the issue may be serious or unclear, the response should **always recommend the user consult a qualified medical professional or visit a doctor for proper diagnosis and treatment.**
-`,
+Khi câu hỏi liên quan đến tình trạng nghiêm trọng hoặc chưa rõ ràng, công cụ phải **luôn khuyến nghị người dùng nên đến gặp bác sĩ hoặc chuyên gia y tế có chuyên môn để được chẩn đoán và điều trị chính xác**.
+    `,
     schema: z.object({
       question: z.string(),
     }),

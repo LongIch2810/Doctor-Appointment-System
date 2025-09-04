@@ -11,12 +11,15 @@ import { JwtRefreshStrategy } from './refresh.strategy';
 import { RedisCacheService } from 'src/redis-cache/redis-cache.service';
 import { GoogleStrategy } from './google.strategy';
 import { MailModule } from 'src/mail/mail.module';
+import { BullmqModule } from 'src/bullmq/bullmq.module';
+import { HealthProfileModule } from '../health-profile/health-profile.module';
 
 @Module({
   imports: [
-    MailModule,
+    BullmqModule,
     UsersModule,
     PassportModule,
+    HealthProfileModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

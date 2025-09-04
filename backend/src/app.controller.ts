@@ -16,8 +16,5 @@ export class AppController {
   }
 
   @Post('send')
-  async send(@Body('email') email: string) {
-    await this.emailProducer.send(jobEmailName.WELCOME, email);
-    return { message: 'Job added' };
-  }
+  async send(@Body('email') email: string) {}
 }

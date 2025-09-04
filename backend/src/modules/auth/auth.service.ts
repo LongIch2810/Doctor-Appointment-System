@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
@@ -8,10 +9,12 @@ import * as bcrypt from 'bcryptjs';
 import User from 'src/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { RegisterDto } from './dto/register.dto';
+import { BodyRegisterDto } from './dto/bodyRegister.dto';
 import { RedisCacheService } from 'src/redis-cache/redis-cache.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Request } from 'express';
+import { EmailProducer } from 'src/bullmq/queues/email/email.producer';
+import { HealthProfileService } from '../health-profile/health-profile.service';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +22,8 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private redisService: RedisCacheService,
+    private emailProducer: EmailProducer,
+    private healthProfileService: HealthProfileService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -86,7 +91,7 @@ export class AuthService {
     };
   }
 
-  async register(dataRegister: RegisterDto): Promise<any> {
+  async register(dataRegister: BodyRegisterDto) {
     const { username, email, password } = dataRegister;
 
     const existsUser =
@@ -94,22 +99,30 @@ export class AuthService {
       (await this.usersService.findByUsernameOrEmail(email));
 
     if (existsUser) {
-      throw new ConflictException('User already exists');
+      throw new ConflictException('Người dùng đã tồn tại.');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await this.usersService.createUser(username, email, hashedPassword);
+    const newUser = await this.usersService.createUser(
+      username,
+      email,
+      hashedPassword,
+    );
+
+    await this.healthProfileService.createHealthProfile(newUser.id);
+    await this.emailProducer.sendWelcome(email, username);
 
     return {
-      message: 'Register successfully',
+      message: 'Đăng ký thành công.',
     };
   }
 
   async logout(req: Request) {
     const refreshToken = req.cookies.refreshToken;
-    console.log(refreshToken);
     const decoded = this.jwtService.decode(refreshToken);
-    console.log(decoded);
+    if (!decoded || typeof decoded !== 'object' || !decoded.tokenId) {
+      throw new UnauthorizedException('Token không hợp lệ !');
+    }
     const now = Math.floor(Date.now() / 1000);
     const ttl = decoded.exp ? decoded.exp - now : 7 * 24 * 60 * 60;
     await this.redisService.setData(`blacklist:${decoded.tokenId}`, true, ttl);
@@ -118,20 +131,10 @@ export class AuthService {
       0,
       -1,
     );
-    console.log(list);
     const match = list.find((t) => JSON.parse(t).tokenId === decoded.tokenId);
-    console.log(match);
     if (!match) throw new UnauthorizedException('Token không hợp lệ !');
-    const count = await this.redisService.lRem(
-      `refresh_tokens:${decoded.sub}`,
-      0,
-      match,
-    );
-    console.log(count);
-    const number = await this.redisService.incr(
-      `session_version:${decoded.sub}`,
-    );
-    console.log(number);
+    await this.redisService.lRem(`refresh_tokens:${decoded.sub}`, 0, match);
+    await this.redisService.incr(`session_version:${decoded.sub}`);
     return { message: 'Logout successfully' };
   }
 
@@ -148,10 +151,7 @@ export class AuthService {
       0,
       -1,
     );
-    console.log(`refresh_tokens:${userId}`);
-    console.log(list);
     const match = list.find((t) => JSON.parse(t).tokenId === tokenId);
-    console.log(match);
     if (!match) throw new UnauthorizedException('Token không hợp lệ !');
     const newTokenId = uuidv4();
     const newPayload = {
@@ -159,12 +159,7 @@ export class AuthService {
       tokenId: newTokenId,
       sessionVersion: sessionVersion,
     };
-    const count = await this.redisService.lRem(
-      `refresh_tokens:${userId}`,
-      0,
-      match,
-    );
-    console.log(count);
+    await this.redisService.lRem(`refresh_tokens:${userId}`, 0, match);
     const now = Math.floor(Date.now() / 1000);
     const parsed = JSON.parse(match);
     const ttl = parsed.exp ? parsed.exp - now : 7 * 24 * 60 * 60;
@@ -192,5 +187,20 @@ export class AuthService {
     );
 
     return { newAccessToken, newRefreshToken };
+  }
+
+  async setNewPassword(email: string, newPassword: string) {
+    const user = await this.usersService.findByUsernameOrEmail(email);
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại !');
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.usersService.updateUserField(
+      user.id,
+      'password',
+      hashedPassword,
+    );
+
+    return { message: 'Đặt lại mật khẩu thành công.' };
   }
 }

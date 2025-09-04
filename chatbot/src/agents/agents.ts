@@ -2,19 +2,33 @@ import * as dotenv from "dotenv";
 
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { MessagesAnnotation, StateGraph } from "@langchain/langgraph";
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
+import { AIMessage } from "@langchain/core/messages";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { ragTool } from "../tools/rag.tool.js";
 import { qaSqlTool } from "../tools/qa_sql.tool.js";
 import { medicalConsultationTool } from "../tools/medical_consultation.tool.js";
+import { bookingAppointmentTool } from "../tools/booking_appointment.tool.js";
+import { cancelAppointmentTool } from "../tools/cancel_appointment.tool.js";
+import { restoreAppointmentTool } from "../tools/restore_appointment.tool.js";
+import { getHealthProfileTool } from "../tools/get_health_profile.tool.js";
+import { updateHealthProfileTool } from "../tools/update_health_profile.tool.js";
 
 dotenv.config();
 
-const tools = [ragTool, qaSqlTool, medicalConsultationTool];
+const tools = [
+  ragTool,
+  qaSqlTool,
+  medicalConsultationTool,
+  bookingAppointmentTool,
+  cancelAppointmentTool,
+  restoreAppointmentTool,
+  getHealthProfileTool,
+  updateHealthProfileTool,
+];
 const toolNode = new ToolNode(tools);
 
 const model = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-flash",
+  model: "gemini-2.5-pro",
   apiKey: process.env.GOOGLE_API_KEY,
   temperature: 0,
 }).bindTools(tools);
@@ -43,24 +57,4 @@ const workflow = new StateGraph(MessagesAnnotation)
 
 const agent = workflow.compile();
 
-let chatHistory: (AIMessage | HumanMessage)[] = [];
-
-const answers = async () => {
-  chatHistory.push(
-    new HumanMessage("Who is the President of the United States?")
-  );
-  const result1 = await agent.invoke({ messages: chatHistory });
-  const reply1 = result1.messages[result1.messages.length - 1] as AIMessage;
-  console.log(reply1.content);
-  chatHistory.push(reply1);
-
-  chatHistory.push(new HumanMessage("How old is he?"));
-  const result2 = await agent.invoke({ messages: chatHistory });
-  const reply2 = result2.messages[result2.messages.length - 1] as AIMessage;
-  console.log(reply2.content);
-  chatHistory.push(reply2);
-};
-
 export default agent;
-
-export { answers };

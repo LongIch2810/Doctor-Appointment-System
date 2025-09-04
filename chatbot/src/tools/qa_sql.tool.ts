@@ -11,21 +11,19 @@ export const qaSqlTool = tool(
   {
     name: "qa_sql_tool",
     description: `
-Use this tool to answer factual questions by directly querying a PostgreSQL medical database. 
-It is suitable for questions that require structured information such as:
+Sử dụng công cụ này để trả lời các câu hỏi thực tế bằng cách truy vấn trực tiếp cơ sở dữ liệu PostgreSQL của hệ thống y tế. 
+Phù hợp với các câu hỏi yêu cầu dữ liệu có cấu trúc như:
 
-- The number of doctors, articles, or specialties.
-- Lists of doctors, specialties, or medical articles.
-- Doctor-related details like experience, workplace, or specialization.
-- Any other query that can be answered using structured tabular data.
+- Số lượng bác sĩ, bài viết, hoặc chuyên khoa.
+- Danh sách bác sĩ, chuyên khoa hoặc các bài viết y tế.
+- Thông tin chi tiết về bác sĩ như kinh nghiệm, nơi làm việc, hoặc chuyên môn.
+- Các truy vấn khác có thể được giải đáp bằng dữ liệu dạng bảng có cấu trúc.
 
-Do **not** use this tool for general knowledge, advice, or opinion-based questions.
+**Không** sử dụng công cụ này cho các câu hỏi kiến thức chung, tư vấn, hoặc mang tính chủ quan.
 
-The tool automatically generates SQL queries from the user's question, runs them on the database, and summarizes the result.
+Công cụ sẽ tự động tạo truy vấn SQL từ câu hỏi của người dùng, thực thi trên cơ sở dữ liệu và tóm tắt kết quả trả về.
 
-📌 Return the answer in **HTML format using Tailwind CSS** — this HTML will be rendered in the UI. Use simple responsive card or table layouts with Tailwind classes for formatting.
-
-📌 The response must remain in the **same language** as the user's question (e.g., English, Vietnamese).
+Phản hồi phải giữ nguyên **ngôn ngữ gốc của câu hỏi người dùng** (ví dụ: tiếng Việt, tiếng Anh).
     `,
     schema: z.object({
       question: z.string(),
