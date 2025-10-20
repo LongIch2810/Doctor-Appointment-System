@@ -42,38 +42,7 @@ export class ArticlesController {
 
   @Post('create-article')
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(
-    FileInterceptor('file', {
-      limits: {
-        fileSize: 5 * 1024 * 1024,
-      },
-      fileFilter: (req, file, cb) => {
-        const allowedMimes = [
-          'image/jpeg',
-          'image/jpg',
-          'image/png',
-          'image/gif',
-          'image/webp',
-        ];
-        if (!allowedMimes.includes(file.mimetype)) {
-          return cb(
-            new BadRequestException('Chỉ chấp nhận ảnh JPG/JPEG/PNG/GIF/WEBP'),
-            false,
-          );
-        }
-
-        const allowedExtensions = /\.(jpg|jpeg|png|gif|webp)$/i;
-        if (!allowedExtensions.test(file.originalname)) {
-          return cb(
-            new BadRequestException('Định dạng file không được hỗ trợ'),
-            false,
-          );
-        }
-        cb(null, true);
-      },
-    }),
-    FileRequiredInterceptor,
-  )
+  @UseInterceptors(new FileRequiredInterceptor())
   async createArticle(
     @Request() req,
     @Body() bodyCreateArticle: BodyCreateArticleDto,

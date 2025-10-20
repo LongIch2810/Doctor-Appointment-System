@@ -7,17 +7,22 @@ import { Typewriter } from "react-simple-typewriter";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useShow } from "@/hooks/useShow";
+import { Unlock, Lock, Mail, UserCircle } from "lucide-react";
+import { useRegister } from "@/hooks/useRegister";
+import Loading from "@/components/loading/Loading";
 
 const schema = z.object({
   username: z.string().min(6, "Username tối thiểu 6 kí tự !"),
-  email: z.string().email("Email không hợp lệ"),
+  email: z.string().email("Email không hợp lệ !"),
   password: z.string().min(6, "Mật khẩu tối thiểu 6 kí tự !"),
 });
 
 type FormData = z.infer<typeof schema>;
 
 const SignUp = () => {
-  const [loading, setLoading] = useState(false);
+  const { isShow, toggleShow } = useShow(false);
+  const { mutate, isPending } = useRegister();
 
   const {
     register,
@@ -28,16 +33,7 @@ const SignUp = () => {
   });
 
   const onSubmit = async (data: FormData) => {
-    setLoading(true);
-
-    // Giả lập gọi API
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-
-    if (data.username && data.email && data.password.length >= 6) {
-      alert("Đăng ký thành công!");
-    }
-
-    setLoading(false);
+    mutate(data);
   };
 
   return (
@@ -85,48 +81,35 @@ const SignUp = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <div>
-                <Input
-                  type="text"
-                  placeholder="Tên đăng nhập"
-                  {...register("username")}
-                />
-                {errors.username && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {errors.username.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  {...register("email")}
-                />
-                {errors.email && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Input
-                  type="password"
-                  placeholder="Mật khẩu"
-                  {...register("password")}
-                />
-                {errors.password && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
+              <Input
+                type="text"
+                icon={<UserCircle size={16} />}
+                placeholder="Tên đăng nhập"
+                error={errors.username?.message}
+                {...register("username")}
+              />
+
+              <Input
+                type="email"
+                icon={<Mail size={16} />}
+                placeholder="Email"
+                error={errors.email?.message}
+                {...register("email")}
+              />
+              <Input
+                type={isShow ? "text" : "password"}
+                placeholder="Mật khẩu"
+                icon={isShow ? <Unlock size={16} /> : <Lock size={16} />}
+                onClickIcon={toggleShow}
+                error={errors.password?.message}
+                {...register("password")}
+              />
               <Button
                 type="submit"
                 className="w-full py-3 text-base"
-                disabled={loading}
+                disabled={isPending}
               >
-                {loading ? "Đang xử lý..." : "Đăng ký"}
+                {isPending ? <Loading /> : "Đăng ký"}
               </Button>
             </form>
           </CardContent>

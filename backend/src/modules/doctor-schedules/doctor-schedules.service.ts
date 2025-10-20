@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { BodyCreateScheduleDto } from './dto/bodyCreateSchedule.dto';
 import Doctor from 'src/entities/doctor.entity';
 import { toMinutes } from 'src/utils/toMinutes';
+import { groupSchedulesByDay } from 'src/utils/groupSchedulesByDay';
 
 @Injectable()
 export class DoctorSchedulesService {
@@ -47,6 +48,8 @@ export class DoctorSchedulesService {
       where: {
         doctor: { id: doctor.id },
         day_of_week: bodyCreateSchedule.day_of_week,
+        start_time: bodyCreateSchedule.start_time,
+        end_time: bodyCreateSchedule.end_time,
       },
     });
 
@@ -96,17 +99,30 @@ export class DoctorSchedulesService {
     };
   }
 
-  async deleteSchedule(doctorScheduleId: number) {
-    const schedule = await this.doctorScheduleRepo.findOne({
-      where: { id: doctorScheduleId },
-    });
-
-    if (!schedule) {
-      throw new NotFoundException('Ca khám không tồn tại.');
+  async getSchedulesByDoctorId(doctorId: number) {
+    const doctor = await this.doctorRepo.findOne({ where: { id: doctorId } });
+    if (!doctor) {
+      throw new NotFoundException('Bác sĩ không tồn tại trong hệ thống.');
     }
 
-    await this.doctorScheduleRepo.softDelete(doctorScheduleId);
+    const schedules = await this.doctorScheduleRepo
+      .createQueryBuilder('schedule')
+      .leftJoinAndSelect('schedule.appointments', 'appointment')
+      .where('schedule.doctor_id = :doctorId', { doctorId })
+      .select([
+        'schedule.id',
+        'schedule.day_of_week',
+        'schedule.start_time',
+        'schedule.end_time',
+        'schedule.is_active',
+        'appointment',
+      ])
+      .orderBy('schedule.day_of_week', 'ASC')
+      .addOrderBy('schedule.start_time', 'ASC')
+      .getMany();
 
-    return { message: 'Xóa ca khám thành công.' };
+    const schedulesGroup = groupSchedulesByDay(schedules);
+
+    return schedulesGroup;
   }
 }

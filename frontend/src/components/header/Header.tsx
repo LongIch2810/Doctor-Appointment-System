@@ -9,8 +9,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Menu, X, XIcon } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import type { User } from "@/types/interface/user.interface";
+import { useLogout } from "@/hooks/useLogout";
 
 const header_items = [
   {
@@ -37,10 +39,6 @@ const header_sub_items = [
     to: "/",
   },
   {
-    name: "Lịch sử thanh toán",
-    to: "/",
-  },
-  {
     name: "Thông tin cá nhân",
     to: "/",
   },
@@ -48,14 +46,22 @@ const header_sub_items = [
     name: "Hồ sơ sức khỏe",
     to: "/",
   },
+  {
+    name: "Tin nhắn",
+    to: "/",
+  },
 ];
 
 type HeaderProps = {
-  isLogged: boolean;
+  userInfo: User | null;
 };
 
-const Header: React.FC<HeaderProps> = ({ isLogged }) => {
+const Header: React.FC<HeaderProps> = ({ userInfo }) => {
   const navigate = useNavigate();
+  const { mutate, isPending } = useLogout();
+  const handleLogout = () => {
+    mutate();
+  };
   return (
     <header className="fixed flex items-center justify-between px-6 py-4 bg-white shadow w-full z-[10]">
       <div className="flex items-center gap-x-5">
@@ -92,7 +98,7 @@ const Header: React.FC<HeaderProps> = ({ isLogged }) => {
             alt="logo"
             className="w-10 h-10 lg:w-20 lg:h-20 rounded-lg"
           />
-          <span>LifeHealth</span>
+          <span className="hidden sm:block">LifeHealth</span>
         </div>
       </div>
 
@@ -112,7 +118,7 @@ const Header: React.FC<HeaderProps> = ({ isLogged }) => {
             {item.name}
           </NavLink>
         ))}
-        {!isLogged ? (
+        {!userInfo ? (
           <NavLink
             to="/sign-in"
             className={({ isActive }) =>
@@ -133,7 +139,10 @@ const Header: React.FC<HeaderProps> = ({ isLogged }) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48">
-              <DropdownMenuLabel>Chào bạn, anhlong!</DropdownMenuLabel>
+              <DropdownMenuLabel>
+                Chào bạn,{" "}
+                <span className="font-bold">{userInfo.username}!</span>
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               {header_sub_items.map((item, index) => (
                 <DropdownMenuItem
@@ -147,9 +156,9 @@ const Header: React.FC<HeaderProps> = ({ isLogged }) => {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() => alert("Đăng xuất")}
+                onClick={handleLogout}
               >
-                Đăng xuất
+                {isPending ? "Đang xử lý ..." : "Đăng xuất"}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -157,9 +166,9 @@ const Header: React.FC<HeaderProps> = ({ isLogged }) => {
       </div>
 
       <div className="md:hidden">
-        {!isLogged ? (
+        {!userInfo ? (
           <NavLink
-            to="/login"
+            to="/sign-in"
             className={({ isActive }) =>
               `p-2 rounded-lg ${
                 isActive
@@ -178,7 +187,10 @@ const Header: React.FC<HeaderProps> = ({ isLogged }) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48">
-              <DropdownMenuLabel>Chào bạn, anhlong!</DropdownMenuLabel>
+              <DropdownMenuLabel>
+                Chào bạn,{" "}
+                <span className="font-bold">{userInfo.username}!</span>
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               {header_sub_items.map((item, index) => (
                 <DropdownMenuItem
@@ -192,9 +204,9 @@ const Header: React.FC<HeaderProps> = ({ isLogged }) => {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() => alert("Đăng xuất")}
+                onClick={handleLogout}
               >
-                Đăng xuất
+                {isPending ? "Đang xử lý ..." : "Đăng xuất"}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

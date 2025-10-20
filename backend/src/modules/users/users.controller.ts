@@ -16,12 +16,12 @@ import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 import { RedisCacheService } from 'src/redis-cache/redis-cache.service';
 import { BodyChangePasswordDto } from './dto/bodyChangePassword.dto';
 import * as bcrypt from 'bcryptjs';
-import { BodyUpdateUserDto } from './dto/bodyUpdateUser.dto';
 import { removePasswordDeep } from 'src/utils/removePasswordDeep';
 import { PartialUpdateUserDto } from './dto/partialUpdateUser.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { CloudinaryService } from 'src/uploads/cloudinary.service';
+import { UploadApiResponse } from 'cloudinary';
+import { formatDate } from 'src/utils/formatDate';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -48,12 +48,10 @@ export class UsersController {
       throw new NotFoundException('Người dùng không tồn tại!');
     }
     const userInfoWithoutPassword = removePasswordDeep(userInfo);
-    await this.redisService.setData(
-      `user:${userId}`,
-      userInfoWithoutPassword,
-      60 * 60,
-    );
-    return userInfo;
+    const userInfoParsed = formatDate(userInfoWithoutPassword);
+
+    await this.redisService.setData(`user:${userId}`, userInfoParsed, 60 * 60);
+    return userInfoParsed;
   }
 
   @Patch('update-info')
@@ -85,13 +83,13 @@ export class UsersController {
       throw new NotFoundException('Người dùng không tồn tại!');
     }
 
-    let uploadedResult: string = '';
+    let uploadedResult: UploadApiResponse | null = null;
     if (file) {
-      uploadedResult = await this.cloudinaryService.uploadImage(file);
+      uploadedResult = await this.cloudinaryService.uploadFile(file);
     }
 
     const fields = uploadedResult
-      ? { ...bodyUpdateUser, picture: uploadedResult }
+      ? { ...bodyUpdateUser, picture: uploadedResult.secure_url }
       : bodyUpdateUser;
 
     await this.userService.updateUserFields(userId, fields);

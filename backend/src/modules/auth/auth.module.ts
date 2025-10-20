@@ -13,13 +13,19 @@ import { GoogleStrategy } from './google.strategy';
 import { MailModule } from 'src/mail/mail.module';
 import { BullmqModule } from 'src/bullmq/bullmq.module';
 import { HealthProfileModule } from '../health-profile/health-profile.module';
+import { RolePermissionModule } from '../role-permission/role-permission.module';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import Relative from 'src/entities/relative.entity';
+import HealthProfile from 'src/entities/healthProfile.entity';
+import Relationship from 'src/entities/relationship.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Relative, HealthProfile, Relationship]),
     BullmqModule,
     UsersModule,
     PassportModule,
-    HealthProfileModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -28,6 +34,7 @@ import { HealthProfileModule } from '../health-profile/health-profile.module';
         signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES') },
       }),
     }),
+    RolePermissionModule,
   ],
   providers: [
     AuthService,

@@ -15,24 +15,34 @@ import Team from "@/pages/Team";
 import Careers from "@/pages/Careers";
 import ForgotPassword from "@/pages/ForgotPassword";
 import Test from "@/pages/Test";
+import DoctorDetail from "@/pages/DoctorDetail";
+import MainLayout from "@/layouts/MainLayout";
+import RouteProtected from "./RouteProtected";
 
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />}></Route>
-      <Route path="/doctors" element={<Doctor />}></Route>
-      <Route path="/news" element={<News />}></Route>
-      <Route path="/contact" element={<Contact />}></Route>
-      <Route path="/chatbot" element={<Chatbot />}></Route>
-      <Route path="/faq" element={<FAQ />}></Route>
-      <Route path="/terms" element={<Terms />}></Route>
-      <Route path="/feedback" element={<Feedback />}></Route>
-      <Route path="/team" element={<Team />}></Route>
-      <Route path="/careers" element={<Careers />}></Route>
-      <Route path="/sign-in" element={<SignIn />}></Route>
+      <Route path="/" element={<MainLayout />}>
+        <Route path="/" element={<Home />}></Route>
+        <Route path="/doctors" element={<Doctor />}></Route>
+        <Route path="/contact" element={<Contact />}></Route>
+        <Route path="/faq" element={<FAQ />}></Route>
+        <Route path="/terms" element={<Terms />}></Route>
+        <Route path="/team" element={<Team />}></Route>
+        <Route path="/careers" element={<Careers />}></Route>
+        <Route path="/forgot-password" element={<ForgotPassword />}></Route>
+        <Route path="/test" element={<Test />}></Route>
+        <Route element={<RouteProtected />}>
+          <Route path="/doctors/:id" element={<DoctorDetail />}></Route>
+          <Route path="/feedback" element={<Feedback />}></Route>
+        </Route>
+      </Route>
+      <Route element={<RouteProtected />}>
+        <Route path="/chatbot" element={<Chatbot />}></Route>
+      </Route>
       <Route path="/sign-up" element={<SignUp />}></Route>
-      <Route path="/forgot-password" element={<ForgotPassword />}></Route>
-      <Route path="/test" element={<Test />}></Route>
+      <Route path="/sign-in" element={<SignIn />}></Route>
+      <Route path="/news" element={<News />}></Route>
       <Route path="*" element={<NotFound />}></Route>
     </Routes>
   );

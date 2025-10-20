@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import MainLayout from "@/layouts/MainLayout";
+import FadeInView from "@/components/view/FadeInView";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -29,10 +29,10 @@ const Contact = () => {
   };
 
   return (
-    <MainLayout>
-      <section className="mt-16 md:mt-28">
-        <div className="max-w-5xl mx-auto py-10 px-4 space-y-10">
-          {/* Phần giới thiệu về LifeHealth */}
+    <section className="mt-16 md:mt-28">
+      <div className="max-w-5xl mx-auto py-10 px-4 space-y-10">
+        {/* Phần giới thiệu về LifeHealth */}
+        <FadeInView>
           <section className="text-center space-y-4">
             <h1 className="text-4xl font-bold text-primary">
               LifeHealth - Đặt lịch khám bác sĩ uy tín
@@ -48,8 +48,10 @@ const Contact = () => {
               hệ thống y tế chất lượng cao.
             </p>
           </section>
+        </FadeInView>
 
-          {/* Dẫn chứng về uy tín */}
+        {/* Dẫn chứng về uy tín */}
+        <FadeInView>
           <section className="grid md:grid-cols-3 gap-6 text-center">
             <div className="bg-white rounded-xl shadow-md p-6 border">
               <h2 className="text-xl font-semibold text-primary mb-2">
@@ -78,8 +80,10 @@ const Contact = () => {
               </p>
             </div>
           </section>
+        </FadeInView>
 
-          {/* Thành tựu nổi bật và uy tín */}
+        {/* Thành tựu nổi bật và uy tín */}
+        <FadeInView>
           <section className="space-y-6">
             <h2 className="text-2xl font-semibold text-primary text-center">
               🌟 Vì sao chọn LifeHealth?
@@ -146,86 +150,86 @@ const Contact = () => {
               </Card>
             </div>
           </section>
+        </FadeInView>
 
-          {/* Thông tin & form liên hệ */}
-          <section className="grid md:grid-cols-2 gap-8 mt-8">
-            {/* Thông tin liên hệ */}
-            <Card>
-              <CardContent className="p-6 space-y-4 text-sm">
-                <h2 className="text-xl font-semibold text-primary">
-                  Thông tin liên hệ
-                </h2>
-                <p>
-                  <strong>🏢 Trụ sở:</strong> 123 Lê Lợi, Quận 1, TP.HCM
-                </p>
-                <p>
-                  <strong>📞 Hotline:</strong> 0909 123 456
-                </p>
-                <p>
-                  <strong>📧 Email:</strong> support@lifehealth.vn
-                </p>
-                <p>
-                  <strong>🕒 Giờ làm việc:</strong> Thứ 2 - Thứ 7: 8h - 17h
-                </p>
-              </CardContent>
-            </Card>
+        {/* Thông tin & form liên hệ */}
+        <section className="grid md:grid-cols-2 gap-8 mt-8">
+          {/* Thông tin liên hệ */}
+          <Card>
+            <CardContent className="p-6 space-y-4 text-sm">
+              <h2 className="text-xl font-semibold text-primary">
+                Thông tin liên hệ
+              </h2>
+              <p>
+                <strong>🏢 Trụ sở:</strong> 123 Lê Lợi, Quận 1, TP.HCM
+              </p>
+              <p>
+                <strong>📞 Hotline:</strong> 0909 123 456
+              </p>
+              <p>
+                <strong>📧 Email:</strong> support@lifehealth.vn
+              </p>
+              <p>
+                <strong>🕒 Giờ làm việc:</strong> Thứ 2 - Thứ 7: 8h - 17h
+              </p>
+            </CardContent>
+          </Card>
 
-            {/* Form liên hệ */}
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Gửi liên hệ</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Họ tên</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone">Số điện thoại</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="message">Nội dung</Label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      rows={4}
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full">
-                    Gửi liên hệ
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </section>
-        </div>
-      </section>
-    </MainLayout>
+          {/* Form liên hệ */}
+          <Card>
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Gửi liên hệ</h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="name">Họ tên</Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Số điện thoại</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="message">Nội dung</Label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    rows={4}
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  Gửi liên hệ
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
+    </section>
   );
 };
 

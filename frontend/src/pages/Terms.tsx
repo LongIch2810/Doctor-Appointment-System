@@ -1,9 +1,9 @@
-import MainLayout from "@/layouts/MainLayout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import FadeInView from "@/components/view/FadeInView";
 
 const Terms = () => {
   return (
-    <MainLayout>
+    <FadeInView>
       <section className="mt-16 md:mt-28">
         <div className="max-w-3xl mx-auto p-6 mt-10">
           <Card>
@@ -63,7 +63,7 @@ const Terms = () => {
           </Card>
         </div>
       </section>
-    </MainLayout>
+    </FadeInView>
   );
 };
 

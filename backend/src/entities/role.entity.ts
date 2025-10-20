@@ -3,14 +3,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Relation,
 } from 'typeorm';
 import UserRole from './userRole.entity';
-import { RoleCode } from 'src/shared/enums/roleCode';
-import { RoleName } from 'src/shared/enums/roleName';
 import RolePermission from './rolePermission.entity';
 
 @Entity('roles')
@@ -19,31 +17,25 @@ export default class Role {
   id: number;
 
   @Column({
-    type: 'enum',
-    unique: true,
     nullable: false,
-    enumName: 'role_name',
-    enum: RoleName,
+    unique: true,
   })
-  name: RoleName;
+  role_name: string;
 
   @Column({ nullable: false })
   description: string;
 
   @Column({
-    type: 'enum',
     unique: true,
-    default: RoleCode.PATIENT,
-    enumName: 'role_code',
-    enum: RoleCode,
+    nullable: false,
   })
-  code: RoleCode;
+  role_code: number;
 
   @OneToMany(() => UserRole, (ur) => ur.role)
-  users: UserRole[];
+  users: Relation<UserRole[]>;
 
-  @OneToMany(() => RolePermission, (rp) => rp)
-  permissions: RolePermission[];
+  @OneToMany(() => RolePermission, (rp) => rp.role)
+  permissions: Relation<RolePermission[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

@@ -14,7 +14,13 @@ import { BodyRegisterDto } from './dto/bodyRegister.dto';
 import { JwtRefreshAuthGuard } from 'src/common/guards/jwtRefresh.guard';
 import { GoogleAuthGuard } from 'src/common/guards/google.guard';
 import { ConfigService } from '@nestjs/config';
-import { HealthProfileService } from '../health-profile/health-profile.service';
+import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
+import { Permissions } from 'src/common/decorators/permission.decorator';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import {
+  ACCESS_TOKEN_EXPIRE_TIME,
+  REFRESH_TOKEN_EXPIRE_TIME,
+} from 'src/utils/constants';
 
 @Controller('auth')
 export class AuthController {
@@ -29,8 +35,8 @@ export class AuthController {
     return message;
   }
 
-  @UseGuards(LocalAuthGuard)
   @Post('login')
+  @UseGuards(LocalAuthGuard)
   async login(@Request() req, @Response() res) {
     const { accessToken, refreshToken } = await this.authService.login(req);
 
@@ -38,14 +44,14 @@ export class AuthController {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000,
+      maxAge: ACCESS_TOKEN_EXPIRE_TIME,
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: REFRESH_TOKEN_EXPIRE_TIME,
     });
 
     return res.status(HttpStatus.OK).json({
@@ -54,10 +60,6 @@ export class AuthController {
       data: { accessToken, refreshToken },
       error: null,
     });
-
-    // return res.redirect(
-    //   this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173',
-    // );
   }
 
   @UseGuards(JwtRefreshAuthGuard)
@@ -72,14 +74,14 @@ export class AuthController {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000,
+      maxAge: ACCESS_TOKEN_EXPIRE_TIME,
     });
 
     res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: REFRESH_TOKEN_EXPIRE_TIME,
     });
 
     return res.status(HttpStatus.OK).json({
@@ -90,7 +92,7 @@ export class AuthController {
     });
   }
 
-  @UseGuards(JwtRefreshAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(@Request() req, @Response() res) {
     const { message } = await this.authService.logout(req);
@@ -117,14 +119,14 @@ export class AuthController {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      maxAge: 15 * 60 * 1000,
+      maxAge: ACCESS_TOKEN_EXPIRE_TIME,
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: REFRESH_TOKEN_EXPIRE_TIME,
     });
 
     return res.redirect(

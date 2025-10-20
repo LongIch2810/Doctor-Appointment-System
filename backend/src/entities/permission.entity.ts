@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
+  Relation,
 } from 'typeorm';
 import RolePermission from './rolePermission.entity';
 
@@ -18,7 +19,7 @@ export default class Permission {
   name: string;
 
   @OneToMany(() => RolePermission, (rp) => rp.permission)
-  roles: RolePermission[];
+  roles: Relation<RolePermission[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

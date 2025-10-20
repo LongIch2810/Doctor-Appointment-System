@@ -7,9 +7,10 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Relation,
 } from 'typeorm';
+
 import UserRole from './userRole.entity';
-import UserNotification from './userNotification.entity';
 import Notification from './notification.entity';
 import Article from './article.entity';
 import HealthProfile from './healthProfile.entity';
@@ -18,8 +19,9 @@ import Appointment from './appointment.entity';
 import Conversation from './conversation.entity';
 import Otp from './otp.entity';
 import Message from './message.entity';
-import Participants from './participants.entity';
+import ChannelMembers from './channelMembers.entity';
 import Complaint from './complaint.entity';
+import Relative from './relative.entity';
 
 @Entity('users')
 export default class User {
@@ -57,40 +59,40 @@ export default class User {
   isAdmin: boolean;
 
   @OneToMany(() => UserRole, (ur) => ur.user)
-  roles: UserRole[];
+  roles: Relation<UserRole[]>;
 
   @OneToMany(() => Notification, (n) => n.sender)
-  sentNotifications: Notification[];
-
-  @OneToMany(() => UserNotification, (un) => un.notification)
-  notifications: UserNotification[];
+  sentNotifications: Relation<Notification[]>;
 
   @OneToMany(() => Article, (a) => a.author)
-  articles: Article[];
+  articles: Relation<Article[]>;
 
   @OneToOne(() => HealthProfile, (hp) => hp.patient)
-  health_profile: HealthProfile;
+  health_profile: Relation<HealthProfile>;
 
   @OneToOne(() => Doctor, (d) => d.user)
-  doctor: Doctor;
+  doctor: Relation<Doctor>;
 
-  @OneToMany(() => Appointment, (ap) => ap.patient)
-  appointments: Appointment[];
+  @OneToMany(() => Appointment, (a) => a.patient)
+  appointments: Relation<Appointment[]>;
 
   @OneToMany(() => Conversation, (c) => c.user)
-  messages: Conversation[];
+  messages: Relation<Conversation[]>;
 
   @OneToMany(() => Otp, (o) => o.user)
-  otps: Otp[];
+  otps: Relation<Otp[]>;
 
   @OneToMany(() => Message, (m) => m.sender)
-  chat_messages: Message[];
+  chat_messages: Relation<Message[]>;
 
-  @OneToMany(() => Participants, (p) => p.user)
-  channels: Participants[];
+  @OneToMany(() => ChannelMembers, (cm) => cm.user)
+  channels: Relation<ChannelMembers[]>;
 
   @OneToMany(() => Complaint, (c) => c.user)
-  complaints: Complaint[];
+  complaints: Relation<Complaint[]>;
+
+  @OneToMany(() => Relative, (r) => r.user)
+  relatives: Relation<Relative[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

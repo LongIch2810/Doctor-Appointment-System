@@ -4,10 +4,8 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  DeleteDateColumn,
   OneToMany,
+  Relation,
 } from 'typeorm';
 import Doctor from './doctor.entity';
 import { DayOfWeek } from 'src/shared/enums/dayOfWeek';
@@ -36,9 +34,9 @@ export default class DoctorSchedule {
   is_active: boolean;
 
   @OneToMany(() => Appointment, (a) => a.doctor_schedule)
-  appointments: Appointment[];
+  appointments: Relation<Appointment[]>;
 
   @ManyToOne(() => Doctor, (d) => d.doctor_schedules)
   @JoinColumn({ name: 'doctor_id' })
-  doctor: Doctor;
+  doctor: Relation<Doctor>;
 }

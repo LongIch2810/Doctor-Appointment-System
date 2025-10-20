@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  forwardRef,
   Get,
+  Inject,
   Param,
   ParseIntPipe,
   Post,
@@ -13,11 +15,16 @@ import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 import { BodyCreateAppointmentDto } from './dto/bodyCreateAppointment.dto';
 import { BodyCancelAppointmentDto } from './dto/bodyCancelAppointment.dto';
 import { BodyPersonalAppointmentsDto } from './dto/bodyPersonalAppointments.dto';
+import { AppointmentProducer } from 'src/bullmq/queues/appointment/appointment.producer';
 
 @Controller('appointments')
 @UseGuards(JwtAuthGuard)
 export class AppointmentsController {
-  constructor(private readonly appointmentsService: AppointmentsService) {}
+  constructor(
+    private readonly appointmentsService: AppointmentsService,
+    @Inject(forwardRef(() => AppointmentProducer))
+    private readonly appointmentProducer: AppointmentProducer,
+  ) {}
 
   @Post('booking-appointment')
   async createAppointment(
@@ -25,11 +32,12 @@ export class AppointmentsController {
     @Request() req,
   ) {
     const { userId } = req.user;
-    const appointmentDetail = await this.appointmentsService.create(
+    const job = await this.appointmentProducer.createAppointment({
       userId,
-      bodyCreateAppointment,
-    );
-    return appointmentDetail;
+      body: bodyCreateAppointment,
+    });
+
+    return { jobId: job.id };
   }
 
   @Post('cancel-appointment')

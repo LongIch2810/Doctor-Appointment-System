@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import FadeInView from "@/components/view/FadeInView";
 
 const Feedback = () => {
   const [form, setForm] = useState({
@@ -32,7 +33,7 @@ const Feedback = () => {
   };
 
   return (
-    <MainLayout>
+    <FadeInView>
       <section className="mt-16 md:mt-28">
         <div className="max-w-2xl mx-auto p-6 mt-12">
           <Card>
@@ -98,7 +99,7 @@ const Feedback = () => {
           </Card>
         </div>
       </section>
-    </MainLayout>
+    </FadeInView>
   );
 };
 

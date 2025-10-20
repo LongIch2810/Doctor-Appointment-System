@@ -7,8 +7,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Relation,
 } from 'typeorm';
 import User from './user.entity';
+import Relative from './relative.entity';
 
 @Entity('health_profile')
 export default class HealthProfile {
@@ -21,61 +23,61 @@ export default class HealthProfile {
   @Column({ nullable: true })
   height: number;
 
-  //Nhóm máu
+  // Nhóm máu
   @Column({ nullable: true })
   blood_type: string;
 
-  //Bệnh nền
+  // Bệnh nền
   @Column({ nullable: true })
   medical_history: string;
 
-  //Dị ứng
+  // Dị ứng
   @Column({ nullable: true })
   allergies: string;
 
-  //Nhịp tim
+  // Nhịp tim
   @Column({ nullable: true })
   heart_rate: number;
 
-  //Huyết áp
+  // Huyết áp
   @Column({ nullable: true })
   blood_pressure: string;
 
-  //Lượng đường huyết (mg/dL)
+  // Lượng đường huyết (mg/dL)
   @Column({ nullable: true })
   glucose_level: number;
 
-  //Mức cholesterol (mg/dL)
+  // Mức cholesterol (mg/dL)
   @Column({ nullable: true })
   cholesterol_level: number;
 
-  //Thuốc đang sử dụng
+  // Thuốc đang sử dụng
   @Column({ nullable: true })
   medications: string;
 
-  //Các mũi vac xin đã tiêm
+  // Các mũi vac xin đã tiêm
   @Column({ nullable: true })
   vaccinations: string;
 
-  //Có hút thuốc không ?
+  // Có hút thuốc không ?
   @Column({ nullable: true })
   smoking: boolean;
 
-  //Có uống rượu hoặc bia không
+  // Có uống rượu hoặc bia không
   @Column({ nullable: true })
   alcohol_consumption: boolean;
 
-  //Tần suất vận động
+  // Tần suất vận động
   @Column({ nullable: true })
   exercise_frequency: string;
 
-  //Ngày khám gần nhất
+  // Ngày khám gần nhất
   @Column({ nullable: true })
   last_checkup_date: Date;
 
-  @OneToOne(() => User, (u) => u.health_profile)
-  @JoinColumn({ name: 'patient_id' })
-  patient: User;
+  @OneToOne(() => Relative, (r) => r.health_profile)
+  @JoinColumn({ name: 'relative_id' })
+  patient: Relation<Relative>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

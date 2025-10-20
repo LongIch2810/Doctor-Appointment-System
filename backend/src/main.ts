@@ -1,24 +1,30 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import * as cookiesParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RemoveFieldPasswordInterceptor } from './common/interceptors/removeFieldPassword.interceptor';
+import { DateFormatInterceptor } from './common/interceptors/dateFormatInterceptor.interceptor';
+import { PermissionsGuard } from './common/guards/permissions.guard';
+import { LoggingInterceptor } from './common/interceptors/loggingInterceptor.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   app.enableCors({
+    origin: ['http://localhost:5173', 'http://localhost:5000'],
     credentials: true,
   });
-  app.use(cookiesParser());
+  app.use(cookieParser());
   app.setGlobalPrefix('api/v1');
   app.useGlobalInterceptors(
     new RemoveFieldPasswordInterceptor(),
+    new DateFormatInterceptor(),
     new ResponseInterceptor(),
+    new LoggingInterceptor(),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());

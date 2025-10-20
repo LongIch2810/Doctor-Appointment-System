@@ -5,9 +5,10 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   OneToMany,
+  Relation,
 } from 'typeorm';
 import Message from './message.entity';
-import Participants from './participants.entity';
+import ChannelMembers from './channelMembers.entity';
 
 @Entity('channels')
 export default class Channel {
@@ -15,10 +16,10 @@ export default class Channel {
   id: number;
 
   @OneToMany(() => Message, (m) => m.channel)
-  chat_messages: Message[];
+  chat_messages: Relation<Message[]>;
 
-  @OneToMany(() => Participants, (p) => p.channel)
-  users: Participants[];
+  @OneToMany(() => ChannelMembers, (cm) => cm.channel)
+  participants: Relation<ChannelMembers[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

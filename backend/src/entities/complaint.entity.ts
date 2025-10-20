@@ -7,6 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Relation,
 } from 'typeorm';
 import User from './user.entity';
 import { ComplaintStatus } from 'src/shared/enums/complaintStatus';
@@ -18,7 +19,7 @@ export default class Complaint {
 
   @ManyToOne(() => User, (u) => u.complaints)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: Relation<User>;
 
   @Column({ nullable: false })
   title: string;

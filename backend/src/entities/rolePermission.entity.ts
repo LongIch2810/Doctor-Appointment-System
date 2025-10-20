@@ -6,6 +6,7 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
+  Relation,
 } from 'typeorm';
 import Role from './role.entity';
 import Permission from './permission.entity';
@@ -17,11 +18,11 @@ export default class RolePermission {
 
   @ManyToOne(() => Role, (r) => r.permissions)
   @JoinColumn({ name: 'role_id' })
-  role: Role;
+  role: Relation<Role>;
 
   @ManyToOne(() => Permission, (p) => p.roles)
   @JoinColumn({ name: 'permission_id' })
-  permission: Permission;
+  permission: Relation<Permission>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

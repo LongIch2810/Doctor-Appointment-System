@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Relation,
 } from 'typeorm';
 import User from './user.entity';
 import Role from './role.entity';
@@ -15,13 +16,13 @@ export default class UserRole {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (u) => u.roles)
+  @ManyToOne(() => User, (user) => user.roles, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: Relation<User>;
 
-  @ManyToOne(() => Role, (r) => r.users)
+  @ManyToOne(() => Role, (role) => role.users, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'role_id' })
-  role: Role;
+  role: Relation<Role>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

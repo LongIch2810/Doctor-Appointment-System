@@ -1,14 +1,28 @@
-export interface User {
-  id: string;
-  name: string;
+import type { DoctorSchedule } from "./interface/doctorSchedule.interface";
+
+export interface DoctorCardData {
+  id: number;
+  user_id: number;
+  fullname: string;
+  picture: string | null;
+  workplace: string;
+  experience: number;
+  doctor_level: string;
+  avg_rating: number;
+  appointments_completed: number;
+  specialty: string;
+  address: string;
+  phone: string;
+  isOutstanding: boolean;
 }
 
-export interface DoctorProps {
-  name: string;
-  avatar: string;
-  specialty: string;
-  hospital: string;
-  experience: number;
+export interface DoctorCardProps {
+  item: DoctorCardData;
+}
+
+export interface DoctorScheduleCardProps {
+  item: DoctorSchedule;
+  selectedDate: Date;
 }
 
 export interface TitleProps {
@@ -40,5 +54,5 @@ export interface FilterItemProps {
   className?: string;
   label: string;
   icon: React.ReactNode;
-  onClick: React.MouseEventHandler<HTMLElement>;
+  onClick?: React.MouseEventHandler<HTMLElement>;
 }

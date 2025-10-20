@@ -8,6 +8,9 @@ import { Typewriter } from "react-simple-typewriter";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Lock, Unlock, UserCircle } from "lucide-react";
+import { useShow } from "@/hooks/useShow";
+import { useLogin } from "@/hooks/useLogin";
 
 const schema = z.object({
   usernameOrEmail: z
@@ -26,25 +29,17 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const SignIn = () => {
-  const [loading, setLoading] = useState(false);
-
+  const { isShow, toggleShow } = useShow(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
+  const { mutate, isPending, error, isError } = useLogin();
+
   const onSubmit = async (data: FormData) => {
-    setLoading(true);
-
-    // Giả lập API
-    await new Promise((r) => setTimeout(r, 1200));
-
-    if (data.usernameOrEmail === "admin" && data.password === "123456") {
-      alert("Đăng nhập thành công!");
-    }
-
-    setLoading(false);
+    mutate(data);
   };
 
   return (
@@ -62,9 +57,9 @@ const SignIn = () => {
             loop={true}
             cursor
             cursorStyle="|"
-            typeSpeed={100} // Tốc độ gõ chậm hơn → mượt
-            deleteSpeed={60} // Tốc độ xoá chậm hơn → mượt
-            delaySpeed={2000} // Giữ lại chữ lâu hơn một chút
+            typeSpeed={100}
+            deleteSpeed={60}
+            delaySpeed={2000}
           />
         </div>
         <p className="text-base md:text-lg opacity-90 leading-relaxed max-w-lg">
@@ -92,30 +87,21 @@ const SignIn = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              <div>
-                <Input
-                  type="text"
-                  placeholder="Tên đăng nhập hoặc email"
-                  {...register("usernameOrEmail")}
-                />
-                {errors.usernameOrEmail && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {errors.usernameOrEmail.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Input
-                  type="password"
-                  placeholder="Mật khẩu"
-                  {...register("password")}
-                />
-                {errors.password && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
+              <Input
+                type="text"
+                placeholder="Tên đăng nhập hoặc email"
+                icon={<UserCircle size={16} />}
+                error={errors.usernameOrEmail?.message}
+                {...register("usernameOrEmail")}
+              />
+              <Input
+                type={isShow ? "text" : "password"}
+                placeholder="Mật khẩu"
+                icon={isShow ? <Unlock size={16} /> : <Lock size={16} />}
+                onClickIcon={toggleShow}
+                error={errors.password?.message}
+                {...register("password")}
+              />
               <div className="flex justify-between text-sm text-gray-500">
                 <Link to="/forgot-password" className="hover:underline">
                   Quên mật khẩu?
@@ -124,9 +110,9 @@ const SignIn = () => {
               <Button
                 type="submit"
                 className="w-full py-3 text-base"
-                disabled={loading}
+                disabled={isPending}
               >
-                {loading ? "Đang xử lý..." : "Đăng nhập"}
+                {isPending ? "Đang xử lý..." : "Đăng nhập"}
               </Button>
             </form>
 

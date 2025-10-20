@@ -8,6 +8,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Relation,
 } from 'typeorm';
 import Doctor from './doctor.entity';
 import User from './user.entity';
@@ -15,6 +16,7 @@ import ExaminationResult from './examinationResult.entity';
 import SatisfactionRating from './satisfactionRating.entity';
 import { AppointmentStatus } from 'src/shared/enums/appointmentStatus';
 import DoctorSchedule from './doctorSchedule.entity';
+import { BookingMode } from 'src/shared/enums/bookingMode';
 
 @Entity('appointments')
 export default class Appointment {
@@ -32,23 +34,35 @@ export default class Appointment {
   })
   status: AppointmentStatus;
 
+  @Column({
+    type: 'enum',
+    default: BookingMode.USER_SELECT,
+    enumName: 'booking_mode',
+    enum: BookingMode,
+  })
+  booking_mode: BookingMode;
+
   @ManyToOne(() => DoctorSchedule, (ds) => ds.appointments, { nullable: false })
   @JoinColumn({ name: 'doctor_schedule_id' })
-  doctor_schedule: DoctorSchedule;
+  doctor_schedule: Relation<DoctorSchedule>;
 
-  @ManyToOne(() => Doctor, (d) => d.appointments)
+  @ManyToOne(() => Doctor, (d) => d.appointments, { nullable: false })
   @JoinColumn({ name: 'doctor_id' })
-  doctor: Doctor;
+  doctor: Relation<Doctor>;
 
-  @ManyToOne(() => User, (u) => u.appointments)
+  @ManyToOne(() => User, (u) => u.appointments, { nullable: false })
   @JoinColumn({ name: 'patient_id' })
-  patient: User;
+  patient: Relation<User>;
 
-  @OneToOne(() => ExaminationResult, (ex) => ex.appointment)
-  examination_result: ExaminationResult;
+  @OneToOne(() => ExaminationResult, (er) => er.appointment, {
+    nullable: false,
+  })
+  examination_result: Relation<ExaminationResult>;
 
-  @OneToOne(() => SatisfactionRating, (s) => s.appointment)
-  satisfaction_rating: SatisfactionRating;
+  @OneToOne(() => SatisfactionRating, (sr) => sr.appointment, {
+    nullable: false,
+  })
+  satisfaction_rating: Relation<SatisfactionRating>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

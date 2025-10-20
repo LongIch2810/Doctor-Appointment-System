@@ -2,12 +2,11 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  JoinColumn,
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Relation,
 } from 'typeorm';
 import Doctor from './doctor.entity';
 
@@ -29,7 +28,7 @@ export default class Specialty {
   img_url: string;
 
   @OneToMany(() => Doctor, (d) => d.specialty)
-  doctors: Doctor[];
+  doctors: Relation<Doctor[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

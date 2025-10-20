@@ -12,6 +12,10 @@ export class ResponseInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
+    const response = context.switchToHttp().getResponse();
+    if (response.headersSent) {
+      return next.handle();
+    }
     return next.handle().pipe(
       map((data) => ({
         statusCode: context.switchToHttp().getResponse().statusCode,

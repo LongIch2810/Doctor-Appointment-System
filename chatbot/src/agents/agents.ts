@@ -1,6 +1,8 @@
 import * as dotenv from "dotenv";
 
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatOpenAI } from "@langchain/openai";
+import { ChatZhipuAI } from "@langchain/community/chat_models/zhipuai";
 import { MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { AIMessage } from "@langchain/core/messages";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
@@ -12,6 +14,7 @@ import { cancelAppointmentTool } from "../tools/cancel_appointment.tool.js";
 import { restoreAppointmentTool } from "../tools/restore_appointment.tool.js";
 import { getHealthProfileTool } from "../tools/get_health_profile.tool.js";
 import { updateHealthProfileTool } from "../tools/update_health_profile.tool.js";
+import { ChatOllama, Ollama } from "@langchain/ollama";
 
 dotenv.config();
 
@@ -27,8 +30,8 @@ const tools = [
 ];
 const toolNode = new ToolNode(tools);
 
-const model = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-pro",
+const llm = new ChatGoogleGenerativeAI({
+  model: process.env.GEMINI_MODEL || "gemini-2.5-pro",
   apiKey: process.env.GOOGLE_API_KEY,
   temperature: 0,
 }).bindTools(tools);
@@ -43,7 +46,7 @@ function shouldContinue({ messages }: typeof MessagesAnnotation.State) {
 }
 
 async function callModel(state: typeof MessagesAnnotation.State) {
-  const response = await model.invoke(state.messages);
+  const response = await llm.invoke(state.messages);
 
   return { messages: [response] };
 }

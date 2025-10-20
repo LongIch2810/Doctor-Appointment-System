@@ -14,7 +14,11 @@ import { RedisCacheService } from 'src/redis-cache/redis-cache.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Request } from 'express';
 import { EmailProducer } from 'src/bullmq/queues/email/email.producer';
-import { HealthProfileService } from '../health-profile/health-profile.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import Relative from 'src/entities/relative.entity';
+import { DataSource, Repository } from 'typeorm';
+import HealthProfile from 'src/entities/healthProfile.entity';
+import Relationship from 'src/entities/relationship.entity';
 
 @Injectable()
 export class AuthService {
@@ -23,98 +27,134 @@ export class AuthService {
     private jwtService: JwtService,
     private redisService: RedisCacheService,
     private emailProducer: EmailProducer,
-    private healthProfileService: HealthProfileService,
     private readonly configService: ConfigService,
+    private dataSource: DataSource,
   ) {}
 
-  async validateUser(
-    usernameOrEmail: string,
-    password: string,
-  ): Promise<User | null> {
+  async validateUser(usernameOrEmail: string, password: string): Promise<any> {
     const user = await this.usersService.findByUsernameOrEmail(usernameOrEmail);
     if (user && (await bcrypt.compare(password, user.password))) {
-      return user;
+      const roles = user.roles.map((r) => r.role.role_name);
+      return { userId: user.id, roles };
     }
     return null;
   }
 
   async login(req: Request) {
-    const user: any = req.user;
-    const sessionVersion =
-      (await this.redisService.getData(`session_version:${user.id}`)) || 1;
-    await this.redisService.setData(
-      `session_version:${user.id}`,
-      sessionVersion,
-    );
+    const { userId, roles }: any = req.user;
+    try {
+      const sessionVersion =
+        (await this.redisService.getData(`session_version:${userId}`)) || 1;
+      await this.redisService.setData(
+        `session_version:${userId}`,
+        sessionVersion,
+      );
 
-    const tokenId = uuidv4();
+      const tokenId = uuidv4();
 
-    const payload = { sub: user.id, tokenId, sessionVersion };
-
-    const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
-      expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
-    });
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
-      expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRE'),
-    });
-    const refreshTokenDecoded = this.jwtService.decode(refreshToken);
-
-    const sessions = await this.redisService.lRange(
-      `refresh_tokens:${user.id}`,
-      0,
-      -1,
-    );
-    if (sessions.length > 3) {
-      const oldest = JSON.parse(sessions[0]);
-      await this.redisService.lPop(`refresh_tokens:${user.id}`);
-      const now = Math.floor(Date.now() / 1000);
-      const ttl = oldest.exp ? oldest.exp - now : 7 * 24 * 60 * 60;
-      await this.redisService.setData(`blacklist:${oldest.tokenId}`, true, ttl);
-    }
-
-    await this.redisService.rPush(
-      `refresh_tokens:${user.id}`,
-      JSON.stringify({
+      const payload = {
+        sub: userId,
+        roles,
         tokenId,
-        userAgent: req.headers['user-agent'],
-        ip: req.ip,
-        issuedAt: new Date().toISOString(),
-        exp: refreshTokenDecoded.exp,
-      }),
-    );
+        sessionVersion,
+      };
 
-    return {
-      accessToken,
-      refreshToken,
-    };
+      const accessToken = this.jwtService.sign(payload, {
+        secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
+        expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
+      });
+      const refreshToken = this.jwtService.sign(payload, {
+        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+        expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRE'),
+      });
+
+      const refreshTokenDecoded = this.jwtService.decode(refreshToken);
+
+      const sessions = await this.redisService.lRange(
+        `refresh_tokens:${userId}`,
+        0,
+        -1,
+      );
+
+      if (sessions.length > 3) {
+        const oldest = JSON.parse(sessions[0]);
+        await this.redisService.lPop(`refresh_tokens:${userId}`);
+        const now = Math.floor(Date.now() / 1000);
+        const ttl = oldest.exp ? oldest.exp - now : 7 * 24 * 60 * 60;
+        await this.redisService.setData(
+          `blacklist:${oldest.tokenId}`,
+          true,
+          ttl,
+        );
+      }
+
+      await this.redisService.rPush(
+        `refresh_tokens:${userId}`,
+        JSON.stringify({
+          tokenId,
+          userAgent: req.headers['user-agent'],
+          ip: req.ip,
+          issuedAt: new Date().toISOString(),
+          exp: refreshTokenDecoded.exp,
+        }),
+      );
+
+      return {
+        accessToken,
+        refreshToken,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   async register(dataRegister: BodyRegisterDto) {
-    const { username, email, password } = dataRegister;
+    try {
+      return await this.dataSource.transaction(async (manager) => {
+        const { username, email, password, fullname } = dataRegister;
 
-    const existsUser =
-      (await this.usersService.findByUsernameOrEmail(username)) ||
-      (await this.usersService.findByUsernameOrEmail(email));
+        const existsUser =
+          (await this.usersService.findByUsernameOrEmail(username)) ||
+          (await this.usersService.findByUsernameOrEmail(email));
 
-    if (existsUser) {
-      throw new ConflictException('Người dùng đã tồn tại.');
+        if (existsUser) throw new ConflictException('Người dùng đã tồn tại.');
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = manager.create(User, {
+          username,
+          email,
+          fullname,
+          password: hashedPassword,
+        });
+        await manager.save(User, newUser);
+
+        const relationship = await manager.findOne(Relationship, {
+          where: { relationship_code: 'ban_than' },
+        });
+
+        if (!relationship)
+          throw new NotFoundException('Mối quan hệ mặc định không tồn tại.');
+
+        const newRelative = manager.create(Relative, {
+          user: newUser,
+          fullname,
+          relationship,
+        });
+        await manager.save(Relative, newRelative);
+
+        const newHealth = manager.create(HealthProfile, {
+          patient: newRelative,
+        });
+        await manager.save(HealthProfile, newHealth);
+
+        await this.emailProducer.sendWelcome(email, username);
+
+        return { message: 'Đăng ký thành công.' };
+      });
+    } catch (error) {
+      console.error('Lỗi khi đăng ký:', error);
+      throw error; // ✅ ném lỗi ra ngoài cho NestJS handle
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await this.usersService.createUser(
-      username,
-      email,
-      hashedPassword,
-    );
-
-    await this.healthProfileService.createHealthProfile(newUser.id);
-    await this.emailProducer.sendWelcome(email, username);
-
-    return {
-      message: 'Đăng ký thành công.',
-    };
   }
 
   async logout(req: Request) {
@@ -135,7 +175,7 @@ export class AuthService {
     if (!match) throw new UnauthorizedException('Token không hợp lệ !');
     await this.redisService.lRem(`refresh_tokens:${decoded.sub}`, 0, match);
     await this.redisService.incr(`session_version:${decoded.sub}`);
-    return { message: 'Logout successfully' };
+    return { message: 'Đăng xuất thành công !' };
   }
 
   async refresh(req: Request, payload: any) {

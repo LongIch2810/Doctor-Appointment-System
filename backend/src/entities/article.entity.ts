@@ -8,10 +8,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Relation,
 } from 'typeorm';
 import Topic from './topic.entity';
 import ArticleTag from './articleTag.entity';
 import User from './user.entity';
+import { ImageInfo } from 'src/shared/interfaces/imageInfo';
 
 @Entity('articles')
 export default class Article {
@@ -24,11 +26,8 @@ export default class Article {
   @Column({ nullable: false })
   content: string;
 
-  @Column({ nullable: true })
-  img_url: string;
-
-  @Column({ nullable: true })
-  img_public_id: string;
+  @Column({ type: 'jsonb', nullable: true })
+  img_urls: ImageInfo[];
 
   @Column({ nullable: false })
   summary: string;
@@ -41,14 +40,14 @@ export default class Article {
 
   @ManyToOne(() => Topic, (t) => t.articles)
   @JoinColumn({ name: 'topic_id' })
-  topic: Topic;
+  topic: Relation<Topic>;
 
-  @OneToMany(() => ArticleTag, (at) => at.article)
-  tags: ArticleTag[];
+  @OneToMany(() => ArticleTag, 'article')
+  tags: Relation<ArticleTag[]>;
 
-  @ManyToOne(() => User, (u) => u.articles)
+  @ManyToOne(() => User, 'articles')
   @JoinColumn({ name: 'author_id' })
-  author: User;
+  author: Relation<User>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

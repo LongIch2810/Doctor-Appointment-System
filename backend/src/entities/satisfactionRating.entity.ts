@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Relation,
 } from 'typeorm';
 import Appointment from './appointment.entity';
 
@@ -21,9 +22,9 @@ export default class SatisfactionRating {
   @Column({ nullable: false })
   feedback: string;
 
-  @OneToOne(() => Appointment, (ap) => ap.satisfaction_rating)
+  @OneToOne(() => Appointment, (a) => a.satisfaction_rating)
   @JoinColumn({ name: 'appointment_id' })
-  appointment: Appointment;
+  appointment: Relation<Appointment>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

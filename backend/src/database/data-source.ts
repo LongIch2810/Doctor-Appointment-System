@@ -13,7 +13,7 @@ const AppDataSource = new DataSource({
   entities: [__dirname + '/../entities/*.entity.ts'],
   migrations: [__dirname + '/migrations/*.ts'],
   synchronize: false,
-  logging: false,
+  logging: true,
 });
 
 export default AppDataSource;

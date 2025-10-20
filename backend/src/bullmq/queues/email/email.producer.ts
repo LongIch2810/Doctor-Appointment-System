@@ -13,9 +13,9 @@ export class EmailProducer {
       { email, otp, username },
       {
         attempts: 3, //Thử lại 3 lần,
-        backoff: { type: 'exponential', delay: 2000 },
-        delay: 5000,
-        removeOnFail: false,
+        backoff: { type: 'exponential', delay: 2000 }, //Khoảng nghỉ trước khi retry khi job thất bại
+        delay: 2000, //Khi add job vào thì sau 2 giây mới bắt đầu chạy lần đầu tiên
+        removeOnFail: false, // Xóa khi gặp lỗi
       },
     );
   }
@@ -25,10 +25,10 @@ export class EmailProducer {
       jobEmailName.WELCOME,
       { email, username },
       {
-        attempts: 3,
-        backoff: { type: 'exponential', delay: 2000 },
-        delay: 5000,
-        removeOnFail: false,
+        attempts: 3, //Thử lại 3 lần,
+        backoff: { type: 'exponential', delay: 2000 }, //Khoảng nghỉ trước khi retry khi job thất bại
+        delay: 2000, //Khi add job vào thì sau 2 giây mới bắt đầu chạy lần đầu tiên
+        removeOnFail: false, // Xóa khi gặp lỗi
       },
     );
   }

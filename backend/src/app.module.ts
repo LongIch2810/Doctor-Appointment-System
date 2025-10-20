@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -18,6 +16,15 @@ import { ArticlesModule } from './modules/articles/articles.module';
 import { DoctorSchedulesModule } from './modules/doctor-schedules/doctor-schedules.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { SpecialtiesModule } from './modules/specialties/specialties.module';
+import { PermissionsModule } from './modules/permissions/permissions.module';
+import { RolesModule } from './modules/roles/roles.module';
+import { RolePermissionModule } from './modules/role-permission/role-permission.module';
+import { WebsocketModule } from './websockets/websoket.module';
+import { MessagesModule } from './modules/messages/messages.module';
+import { ChannelsModule } from './modules/channels/channels.module';
+import { CloudinaryModule } from './uploads/cloudinary.module';
+import { WsCookieAuthGuard } from './common/guards/wsCookieAuth.guard';
+import { RelativesModule } from './modules/relatives/relatives.module';
 
 @Module({
   imports: [
@@ -33,6 +40,7 @@ import { SpecialtiesModule } from './modules/specialties/specialties.module';
     MailModule,
     OtpsModule,
     ChatHistoryModule,
+    WebsocketModule,
     AppointmentsModule,
     DoctorsModule,
     HealthProfileModule,
@@ -40,8 +48,13 @@ import { SpecialtiesModule } from './modules/specialties/specialties.module';
     DoctorSchedulesModule,
     TopicsModule,
     SpecialtiesModule,
+    RolesModule,
+    PermissionsModule,
+    RolePermissionModule,
+    MessagesModule,
+    ChannelsModule,
+    CloudinaryModule,
+    RelativesModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

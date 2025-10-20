@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Relation,
 } from 'typeorm';
 import Article from './article.entity';
 import Tag from './tag.entity';
@@ -18,11 +19,11 @@ export default class ArticleTag {
 
   @ManyToOne(() => Article, (a) => a.tags)
   @JoinColumn({ name: 'article_id' })
-  article: Article;
+  article: Relation<Article>;
 
   @ManyToOne(() => Tag, (t) => t.articles)
   @JoinColumn({ name: 'tag_id' })
-  tag: Tag;
+  tag: Relation<Tag>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

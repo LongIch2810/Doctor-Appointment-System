@@ -4,7 +4,7 @@ import { MailService } from 'src/mail/mail.service';
 import { jobEmailName } from 'src/shared/enums/jobEmailName';
 
 @Processor('email-queue', {
-  concurrency: 10,
+  concurrency: 20,
 })
 export class EmailProcessor extends WorkerHost {
   constructor(private readonly mailService: MailService) {

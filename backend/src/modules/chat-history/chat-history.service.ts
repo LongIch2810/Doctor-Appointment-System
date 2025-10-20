@@ -33,7 +33,7 @@ export class ChatHistoryService {
     });
   }
 
-  async getChatHistory(userId: number) {
+  async getChatHistoryContext(userId: number) {
     const user = await this.usersService.findByUserId(userId);
     if (!user) {
       throw new NotFoundException('Người dùng không tồn tại !');
@@ -53,6 +53,10 @@ export class ChatHistoryService {
       throw new NotFoundException('Người dùng không tồn tại !');
     }
 
+    if (!token) {
+      throw new UnauthorizedException('Unauthorized');
+    }
+
     try {
       const response = await axios.post(
         `${this.configService.get<string>('CHATBOT_URL')}/chatbot/chat`,
@@ -66,10 +70,55 @@ export class ChatHistoryService {
     } catch (error) {
       console.log('>>> error:', error);
       console.error('Chatbot error:', error?.response?.data || error.message);
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (status === 401) {
+          // Chatbot service reject vì token không hợp lệ
+          throw new UnauthorizedException(
+            'Token is invalid or expired for chatbot service',
+          );
+        }
+      }
       throw new HttpException(
         'Failed to get response from chatbot',
         error?.response?.status || 500,
       );
     }
+  }
+
+  async getChatHistory(userId: number, page: number = 1, limit: number = 50) {
+    page = Math.max(1, page);
+    limit = Math.max(1, limit);
+    const skip = (page - 1) * limit;
+
+    const query = this.conversationRepo
+      .createQueryBuilder('conversation')
+      .innerJoin('conversation.user', 'user')
+      .select([
+        'conversation.id AS id',
+        'conversation.role AS role',
+        'conversation.content AS content',
+      ])
+      .where('user.id = :userId', { userId })
+      .orderBy('conversation.created_at', 'DESC')
+      .limit(limit)
+      .offset(skip);
+
+    const [messages, total] = await Promise.all([
+      query.getRawMany(),
+      query.getCount(),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+    const result = {
+      total,
+      messages: messages.reverse(),
+      page,
+      limit,
+      totalPages,
+    };
+
+    return result;
   }
 }

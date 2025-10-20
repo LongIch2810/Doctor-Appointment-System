@@ -21,7 +21,7 @@ const handleChatService = async ({ question, userId, token }: ChatInput) => {
       }
     );
     const { data: history } = await axios.get(
-      `${process.env.BACKEND_URL}/api/v1/chat-history/${userId}`,
+      `${process.env.BACKEND_URL}/api/v1/chat-history/context/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -34,14 +34,12 @@ const handleChatService = async ({ question, userId, token }: ChatInput) => {
         : new AIMessage(item.content)
     );
 
-    const result = await agent.invoke(
-      { messages: chatHistory },
-      {
-        configurable: {
-          token,
-        },
-      }
-    );
+    const result = await agent.invoke({ messages: chatHistory }, {
+      // state_id: userId.toString(),
+      configurable: {
+        token,
+      },
+    } as any);
 
     const reply = result.messages[result.messages.length - 1] as AIMessage;
 
@@ -64,7 +62,14 @@ const handleChatService = async ({ question, userId, token }: ChatInput) => {
       answer: reply.content,
     };
   } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      return {
+        SC: error.response?.status,
+        err: "Unauthorized",
+      };
+    }
     const err = error as Error;
+    console.log(err);
     return {
       SC: 500,
       err: err.message,

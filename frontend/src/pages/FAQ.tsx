@@ -5,12 +5,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import MainLayout from "@/layouts/MainLayout";
+import FadeInView from "@/components/view/FadeInView";
 
 const FAQ = () => {
   return (
-    <MainLayout>
-      <section className="mt-16 md:mt-28">
-        <div className="max-w-3xl mx-auto p-6 mt-12 space-y-6">
+    <section className="mt-16 md:mt-28">
+      <div className="max-w-3xl mx-auto p-6 mt-12 space-y-6">
+        <FadeInView>
           <h1 className="text-3xl font-bold text-center text-primary">
             Câu hỏi thường gặp
           </h1>
@@ -19,7 +20,9 @@ const FAQ = () => {
             danh sách những câu hỏi phổ biến nhất để giúp bạn giải đáp nhanh
             chóng và dễ dàng hơn.
           </p>
+        </FadeInView>
 
+        <FadeInView>
           <Accordion type="multiple" className="space-y-4 mt-4">
             <AccordionItem value="q1">
               <AccordionTrigger>LifeHealth là gì?</AccordionTrigger>
@@ -116,9 +119,9 @@ const FAQ = () => {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-        </div>
-      </section>
-    </MainLayout>
+        </FadeInView>
+      </div>
+    </section>
   );
 };
 

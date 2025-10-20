@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 export class BodyFilterDoctorsDto extends PaginationDto {
@@ -8,12 +8,17 @@ export class BodyFilterDoctorsDto extends PaginationDto {
 
   @IsNumber()
   @IsOptional()
-  @Min(1)
-  experience?: number;
+  @Min(3)
+  min_experience?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Max(50)
+  max_experience?: number;
 
   @IsString()
   @IsOptional()
-  workspace?: string;
+  workplace?: string;
 
   @IsString()
   @IsOptional()

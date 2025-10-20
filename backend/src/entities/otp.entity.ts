@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   Column,
+  Relation,
 } from 'typeorm';
 import User from './user.entity';
 
@@ -23,5 +24,5 @@ export default class Otp {
 
   @ManyToOne(() => User, (u) => u.otps)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: Relation<User>;
 }

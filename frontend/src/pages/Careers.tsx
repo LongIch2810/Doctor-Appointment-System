@@ -1,6 +1,7 @@
 import MainLayout from "@/layouts/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import FadeInView from "@/components/view/FadeInView";
 
 const jobOpenings = [
   {
@@ -62,8 +63,8 @@ const jobOpenings = [
 
 const Careers = () => {
   return (
-    <MainLayout>
-      <section className="mt-16 md:mt-28">
+    <section className="mt-16 md:mt-28">
+      <FadeInView>
         <h1 className="text-4xl font-extrabold text-center text-primary mb-6">
           Cơ hội nghề nghiệp tại LifeHealth
         </h1>
@@ -73,13 +74,12 @@ const Careers = () => {
           đam mê công nghệ và sức khỏe cộng đồng, hãy tham gia đội ngũ của chúng
           tôi!
         </p>
+      </FadeInView>
 
-        <div className="space-y-8">
-          {jobOpenings.map((job) => (
-            <Card
-              key={job.id}
-              className="p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
-            >
+      <div className="space-y-8">
+        {jobOpenings.map((job) => (
+          <FadeInView key={job.id}>
+            <Card className="p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <CardHeader className="p-0 mb-4">
                 <CardTitle className="text-2xl font-semibold">
                   {job.title}
@@ -123,10 +123,10 @@ const Careers = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      </section>
-    </MainLayout>
+          </FadeInView>
+        ))}
+      </div>
+    </section>
   );
 };
 

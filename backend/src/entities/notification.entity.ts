@@ -4,13 +4,12 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import User from './user.entity';
-import UserNotification from './userNotification.entity';
-import { ManyToOne } from 'typeorm';
 
 @Entity('notifications')
 export default class Notification {
@@ -25,10 +24,7 @@ export default class Notification {
 
   @ManyToOne(() => User, (u) => u.sentNotifications)
   @JoinColumn({ name: 'sender_id' })
-  sender: User;
-
-  @OneToMany(() => UserNotification, (un) => un.notification)
-  users: UserNotification[];
+  sender: Relation<User>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

@@ -24,12 +24,16 @@ const buttonVariants = cva(
           "cursor-pointer bg-primary text-white border border-primary hover:bg-white hover:text-primary transition-colors duration-300",
         google:
           "cursor-pointer bg-error text-white border border-error hover:bg-white hover:text-error transition-colors duration-300",
+        details:
+          "cursor-pointer bg-details text-white border border-details hover:bg-white hover:text-details transition-colors duration-300",
+        sky: "cursor-pointer bg-sky text-white border border-sky hover:bg-white hover:text-sky transition-colors duration-300",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",
+        mini: "size-4",
       },
     },
     defaultVariants: {

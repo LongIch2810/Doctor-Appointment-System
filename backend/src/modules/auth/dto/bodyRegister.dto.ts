@@ -10,6 +10,11 @@ export class BodyRegisterDto {
   email: string;
 
   @IsString()
+  @IsNotEmpty()
+  @MinLength(3)
+  fullname: string;
+
+  @IsString()
   @MinLength(6)
   password: string;
 }

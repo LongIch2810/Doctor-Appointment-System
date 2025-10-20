@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Patch,
   Post,
   UploadedFile,
@@ -17,9 +19,9 @@ import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 import { BodyCreateSpecialtyDto } from './dto/bodyCreateSpecialty.dto';
 import { diskStorage } from 'multer';
 import { FileRequiredInterceptor } from 'src/common/interceptors/fileRequiredInterceptor.interceptor';
+import { BodyFilterSpecialtiesDto } from './dto/bodyFilterSpecialties.dto';
 
 @Controller('specialties')
-@UseGuards(JwtAuthGuard)
 export class SpecialtiesController {
   constructor(
     private specialtiesService: SpecialtiesService,
@@ -27,23 +29,8 @@ export class SpecialtiesController {
   ) {}
 
   @Post('create-specialty')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      limits: {
-        fileSize: 5 * 1024 * 1024,
-      },
-      fileFilter: (req, file, cb) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
-          return cb(
-            new BadRequestException('Chỉ chấp nhận ảnh JPG/PNG/GIF/WEBP'),
-            false,
-          );
-        }
-        cb(null, true);
-      },
-    }),
-    FileRequiredInterceptor,
-  )
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(new FileRequiredInterceptor())
   async createSpecialty(
     @Body() bodyCreateSpecialty: BodyCreateSpecialtyDto,
     @UploadedFile() file: Express.Multer.File,
@@ -52,20 +39,34 @@ export class SpecialtiesController {
     const { message: messageResult } =
       await this.specialtiesService.createSpecialty({
         ...bodyCreateSpecialty,
-        img_url: uploadedResult,
+        img_url: uploadedResult.secure_url,
       });
     return messageResult;
   }
 
   @Patch(':specialtyId')
+  @UseGuards(JwtAuthGuard)
   async updateSpecialty() {}
 
   @Delete(':specialtyId')
+  @UseGuards(JwtAuthGuard)
   async deleteSpecialty() {}
 
   @Get(':specialtyId')
+  @UseGuards(JwtAuthGuard)
   async getSpecialty() {}
 
-  @Get()
-  async getSpecialties() {}
+  @Post()
+  @HttpCode(HttpStatus.OK)
+  async getSpecialties(
+    @Body() bodyFilterSpecialties: BodyFilterSpecialtiesDto,
+  ) {
+    const { page, limit, ...objectFilter } = bodyFilterSpecialties;
+    const result = await this.specialtiesService.filterAndPagination(
+      page,
+      limit,
+      objectFilter,
+    );
+    return result;
+  }
 }

@@ -21,7 +21,14 @@ export class CloudinaryService {
   async uploadMultipleFiles(
     files: Express.Multer.File[],
   ): Promise<UploadApiResponse[]> {
-    const uploadPromises = files.map((file) => this.uploadFile(file));
+    const normalizedFiles = files.map((file) => {
+      if (file.buffer && !(file.buffer instanceof Buffer)) {
+        file.buffer = Buffer.from((file.buffer as any).data); // 👈 chuyển object → Buffer
+      }
+      return file;
+    });
+
+    const uploadPromises = normalizedFiles.map((file) => this.uploadFile(file));
     return Promise.all(uploadPromises);
   }
 

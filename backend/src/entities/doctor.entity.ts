@@ -9,11 +9,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Relation,
 } from 'typeorm';
 import Specialty from './specialty.entity';
 import User from './user.entity';
 import Appointment from './appointment.entity';
 import DoctorSchedule from './doctorSchedule.entity';
+import { DoctorLevel } from 'src/shared/enums/doctorLevel';
 
 @Entity('doctors')
 export default class Doctor {
@@ -29,19 +31,27 @@ export default class Doctor {
   @Column({ nullable: false })
   workplace: string;
 
+  @Column({
+    type: 'enum',
+    enum: DoctorLevel,
+    default: DoctorLevel.DK,
+    name: 'doctor_level',
+  })
+  doctor_level: DoctorLevel;
+
   @ManyToOne(() => Specialty, (s) => s.doctors)
   @JoinColumn({ name: 'specialty_id' })
-  specialty: Specialty;
+  specialty: Relation<Specialty>;
 
   @OneToOne(() => User, (u) => u.doctor)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: Relation<User>;
 
-  @OneToMany(() => Appointment, (ap) => ap.doctor)
-  appointments: Appointment[];
+  @OneToMany(() => Appointment, (a) => a.doctor)
+  appointments: Relation<Appointment[]>;
 
   @OneToMany(() => DoctorSchedule, (ds) => ds.doctor)
-  doctor_schedules: DoctorSchedule[];
+  doctor_schedules: Relation<DoctorSchedule[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

@@ -7,11 +7,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Relation,
 } from 'typeorm';
 import User from './user.entity';
 import Channel from './channel.entity';
+import MessageAttachments from './messageAttachments.entity';
 
 @Entity('messages')
 export default class Message {
@@ -29,28 +32,13 @@ export default class Message {
   @Column({ nullable: true })
   content: string;
 
-  @Column({ nullable: true })
-  img_url: string;
-
-  @Column({ nullable: true })
-  img_public_id: string;
-
-  @Column({ nullable: true })
-  file_url: string;
-
-  @Column({ nullable: true })
-  file_name: string;
-
-  @Column({ nullable: true })
-  file_mime: string;
-
-  @Column({ type: 'bigint', nullable: true })
-  file_size: number;
+  @OneToMany(() => MessageAttachments, (ma) => ma.message)
+  message_attachments: Relation<MessageAttachments[]>;
 
   @Column({
     type: 'enum',
     nullable: true,
-    enumName: 'message_type',
+    enumName: 'call_status',
     enum: CallStatus,
   })
   call_status: CallStatus;
@@ -60,14 +48,11 @@ export default class Message {
 
   @ManyToOne(() => User, (u) => u.chat_messages)
   @JoinColumn({ name: 'sender_id' })
-  sender: User;
+  sender: Relation<User>;
 
   @ManyToOne(() => Channel, (c) => c.chat_messages)
   @JoinColumn({ name: 'channel_id' })
-  channel: Channel;
-
-  @Column({ default: false })
-  is_read: boolean;
+  channel: Relation<Channel>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

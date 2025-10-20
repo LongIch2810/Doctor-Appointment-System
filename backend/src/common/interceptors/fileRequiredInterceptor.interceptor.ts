@@ -11,18 +11,41 @@ import { Observable } from 'rxjs';
 export class FileRequiredInterceptor implements NestInterceptor {
   constructor(
     private readonly allowedMimeTypes: string[] = [
+      // images
       'image/jpeg',
       'image/jpg',
       'image/png',
       'image/gif',
       'image/webp',
+
+      // videos
+      'video/mp4',
+      'video/mpeg',
+      'video/webm',
+      'video/ogg',
+      'video/quicktime',
+
+      // documents
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain',
     ],
-    private readonly maxFileSize: number = 5 * 1024 * 1024,
+    private readonly maxFileSize: number = 20 * 1024 * 1024, // 20MB
   ) {}
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const file = request.file;
     const files = request.files;
+    console.log('>>> files : ', files);
+    if (!file && (!files || files.length === 0)) {
+      throw new BadRequestException('No file provided!');
+    }
+
     if (file) {
       this.validateFile(file);
     }

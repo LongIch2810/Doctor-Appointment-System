@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -17,14 +18,11 @@ import { BodyChatDto } from './dto/bodyChat.dto';
 @Controller('chat-history')
 @UseGuards(JwtAuthGuard)
 export class ChatHistoryController {
-  constructor(
-    private chatHistoryService: ChatHistoryService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private chatHistoryService: ChatHistoryService) {}
 
-  @Get(':userId')
-  async getChatHistory(@Param('userId', ParseIntPipe) userId: number) {
-    const history = await this.chatHistoryService.getChatHistory(userId);
+  @Get('/context/:userId')
+  async getChatHistoryContext(@Param('userId', ParseIntPipe) userId: number) {
+    const history = await this.chatHistoryService.getChatHistoryContext(userId);
     return history.reverse();
   }
 
@@ -39,7 +37,6 @@ export class ChatHistoryController {
   async chatWithChatbot(@Request() req, @Body() body: BodyChatDto) {
     const { userId } = req.user;
     const { accessToken: token } = req.cookies;
-    console.log('>>> token:', token);
     const { question } = body;
     const answer = await this.chatHistoryService.chatbotAnswer(
       userId,
@@ -47,5 +44,13 @@ export class ChatHistoryController {
       token,
     );
     return { answer };
+  }
+
+  @Get(':userId')
+  getChatHistory(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('page', ParseIntPipe) page: number,
+  ) {
+    return this.chatHistoryService.getChatHistory(userId, page);
   }
 }

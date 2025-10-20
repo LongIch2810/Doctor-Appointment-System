@@ -2,6 +2,7 @@ import MainLayout from "@/layouts/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Mail, Linkedin } from "lucide-react";
+import FadeInView from "@/components/view/FadeInView";
 
 const teamMembers = [
   {
@@ -55,8 +56,8 @@ const teamMembers = [
 
 const Team = () => {
   return (
-    <MainLayout>
-      <section className="mt-16 md:mt-28">
+    <section className="mt-16 md:mt-28">
+      <FadeInView>
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-2xl font-semibold mb-4 text-primary">
             Đội ngũ chuyên gia hàng đầu của LifeHealth
@@ -76,7 +77,8 @@ const Team = () => {
             minh bạch và phát triển bền vững.
           </p>
         </div>
-
+      </FadeInView>
+      <FadeInView>
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 mt-12 px-4">
           {teamMembers.map((member, index) => (
             <Card
@@ -128,8 +130,8 @@ const Team = () => {
             </Card>
           ))}
         </div>
-      </section>
-    </MainLayout>
+      </FadeInView>
+    </section>
   );
 };
 

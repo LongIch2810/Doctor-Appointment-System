@@ -1,91 +1,60 @@
 import * as dotenv from "dotenv";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import axios from "axios";
+import bookingGraph from "../langgraph/booking.graph.js";
 
 dotenv.config();
 
 export const bookingAppointmentTool = tool(
-  async (
-    { appointment_date, start_time, end_time, doctor_name, specialty_name },
-    runManager
-  ) => {
+  async ({ text_input }, runManager) => {
     try {
       const token = runManager?.configurable?.token;
+      if (!token)
+        return "❌ Bạn chưa đăng nhập. Vui lòng đăng nhập trước khi đặt lịch.";
 
-      if (!token) {
-        return "Lỗi: Người dùng chưa đăng nhập. Không thể đặt lịch.";
-      }
+      const result = await bookingGraph.invoke({ text_input, token });
 
-      const response = await axios.post(
-        `${process.env.BACKEND_URL}/api/v1/appointments/booking-appointment`,
-        {
-          appointment_date,
-          start_time,
-          end_time,
-          doctor_name,
-          specialty_name,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      console.log("🧩 bookingGraph result:", JSON.stringify(result, null, 2));
 
-      const appointment = response.data?.data;
-      const message = response.data?.message;
+      if (!result) return "⚠️ Không thể xử lý yêu cầu đặt lịch.";
 
-      if (!appointment) {
-        return `Lịch hẹn đã được đặt, nhưng không có thông tin chi tiết.\nHệ thống phản hồi: ${
-          message || "Không rõ lý do."
-        }`;
-      }
+      const br = result.booking_result;
 
-      return `Đặt lịch thành công!\n\nNgày: ${
-        appointment.appointment_date
-      }\nThời gian: ${appointment.start_time} - ${
-        appointment.end_time
-      }\nBác sĩ: ${appointment.doctor_name}\nChuyên khoa: ${
-        appointment.specialty_name
-      }\nTrạng thái: ${appointment.status || "Đang chờ xử lý"}`;
+      if (br?.status === "pending") return br.message;
+      if (br?.status === "need_user_choice") return br.message;
+      if (typeof br === "string") return br;
+
+      return "✅ Đặt lịch thành công.";
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errMsg =
-          error.response?.data?.message ||
-          error.response?.data?.error?.details ||
-          "Không rõ lỗi từ phía server.";
-        return `Lỗi từ API khi đặt lịch: ${errMsg}`;
-      }
-      console.error("Generic Error on booking:", error);
-      return "Lỗi không xác định khi đặt lịch. Vui lòng thử lại sau.";
+      console.error("🔥 Lỗi trong bookingAppointmentTool:", error);
+      return "❌ Lỗi hệ thống khi đặt lịch. Vui lòng thử lại.";
     }
   },
   {
     name: "booking_appointment_tool",
     description: `
-Dùng công cụ này để đặt lịch hẹn khám bệnh cho người dùng đã xác thực.
-Trường bắt buộc:
-- appointment_date: Định dạng YYYY-MM-DD.
-- start_time: Thời gian bắt đầu, định dạng HH:mm (24h).
-- end_time: Thời gian kết thúc, định dạng HH:mm (24h).
-- doctor_name: Tên đầy đủ của bác sĩ mong muốn.
-- specialty_name: Tên chuyên khoa cần khám.
+Công cụ này **thực thi hành động đặt lịch khám bệnh** cho người dùng đã đăng nhập.  
+Không cần AI tự phân tích thủ công — toàn bộ logic phân tích (bác sĩ, người khám, chuyên khoa, thời gian...) đã được xử lý trong LangGraph.
 
-Trả về xác nhận chi tiết lịch hẹn hoặc thông báo lỗi rõ ràng.
-`,
+Khi người dùng nói những câu như:
+- "Đặt lịch khám với bác sĩ Tuấn sáng mai cho bé Lan"
+- "Muốn khám tim mạch chiều nay"
+- "Book lịch với bác sĩ Minh ngày mai"
+
+➡️ Hãy **gọi ngay tool này** để thực hiện việc đặt lịch.
+Tool sẽ tự:
+1. Phân tích văn bản.
+2. Kiểm tra dữ liệu còn thiếu.
+3. Nếu đủ thông tin → gửi yêu cầu đặt lịch.
+4. Nếu thiếu → trả về danh sách cần bổ sung.
+
+Không cần LLM hỏi lại nếu thông tin đã đầy đủ.`,
     schema: z.object({
-      appointment_date: z
+      text_input: z
         .string()
-        .describe("Ngày đặt lịch theo định dạng YYYY-MM-DD. Ví dụ: 2025-08-28"),
-      start_time: z
-        .string()
-        .describe("Thời gian bắt đầu, định dạng HH:mm. Ví dụ: 14:30"),
-      end_time: z
-        .string()
-        .describe("Thời gian kết thúc, định dạng HH:mm. Ví dụ: 15:00"),
-      doctor_name: z.string().describe("Tên đầy đủ của bác sĩ."),
-      specialty_name: z.string().describe("Tên chuyên khoa."),
+        .describe(
+          "Câu mô tả yêu cầu đặt lịch, ví dụ: 'Đặt lịch khám cho bé Lan với bác sĩ Tuấn sáng mai lúc 9 giờ'."
+        ),
     }),
   }
 );

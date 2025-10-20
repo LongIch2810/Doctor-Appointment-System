@@ -1,5 +1,7 @@
+import Appointment from 'src/entities/appointment.entity';
 import DoctorSchedule from 'src/entities/doctorSchedule.entity';
 import { DayOfWeek } from 'src/shared/enums/dayOfWeek';
+import { toHHMM } from './toMinutes';
 
 export const groupSchedulesByDay = (schedules: DoctorSchedule[]) => {
   return schedules.reduce(
@@ -11,16 +13,23 @@ export const groupSchedulesByDay = (schedules: DoctorSchedule[]) => {
 
       acc[day].push({
         id: schedule.id,
-        start_time: schedule.start_time,
-        end_time: schedule.end_time,
+        start_time: toHHMM(schedule.start_time),
+        end_time: toHHMM(schedule.end_time),
         is_active: schedule.is_active,
+        appointments: schedule.appointments,
       });
 
       return acc;
     },
     {} as Record<
       DayOfWeek,
-      { id: number; start_time: string; end_time: string; is_active: boolean }[]
+      {
+        id: number;
+        start_time: string;
+        end_time: string;
+        is_active: boolean;
+        appointments: Appointment[];
+      }[]
     >,
   );
 };

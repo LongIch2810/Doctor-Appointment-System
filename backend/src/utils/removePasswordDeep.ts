@@ -1,4 +1,7 @@
+import { formatDateDDMMYYYY } from './formatDate';
+
 export const removePasswordDeep = (obj: any): any => {
+  if (obj instanceof Date) return formatDateDDMMYYYY(obj);
   if (Array.isArray(obj)) {
     return obj.map(removePasswordDeep);
   } else if (obj && typeof obj === 'object') {
@@ -8,7 +11,6 @@ export const removePasswordDeep = (obj: any): any => {
         rest[key] = removePasswordDeep(rest[key]);
       }
     }
-
     return rest;
   }
 

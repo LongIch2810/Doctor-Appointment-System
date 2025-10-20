@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Relation,
 } from 'typeorm';
 import ArticleTag from './articleTag.entity';
 
@@ -21,7 +22,7 @@ export default class Tag {
   slug: string;
 
   @OneToMany(() => ArticleTag, (at) => at.tag)
-  articles: ArticleTag[];
+  articles: Relation<ArticleTag[]>;
 
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;

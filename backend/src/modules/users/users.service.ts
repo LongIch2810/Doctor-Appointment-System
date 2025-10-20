@@ -1,12 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import Role from 'src/entities/role.entity';
 import User from 'src/entities/user.entity';
+import UserRole from 'src/entities/userRole.entity';
+import { RoleCode } from 'src/shared/enums/roleCode';
+import { role_name } from 'src/utils/constants';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(UserRole)
+    private readonly userRoleRepo: Repository<UserRole>,
+    @InjectRepository(Role)
+    private readonly roleRepo: Repository<Role>,
   ) {}
 
   findAll(): Promise<User[]> {
@@ -16,6 +24,7 @@ export class UsersService {
   async findByUsernameOrEmail(usernameOrEmail: string): Promise<User | null> {
     const user = await this.userRepo.findOne({
       where: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
+      relations: ['roles', 'roles.role'],
     });
 
     return user;
@@ -29,18 +38,33 @@ export class UsersService {
     return user;
   }
 
-  async createUser(username: string, email: string, password: string | null) {
-    const createdUser = password
-      ? this.userRepo.create({
+  async createUser(
+    username: string,
+    email: string,
+    fullname: string,
+    password: string | null,
+  ) {
+    const createdData = password
+      ? {
           username,
           email,
+          fullname,
           password,
-        })
-      : this.userRepo.create({
-          username,
-          email,
-        });
-    return await this.userRepo.save(createdUser);
+        }
+      : { username, email, fullname };
+    const createdUser = this.userRepo.create(createdData);
+    const newUser = await this.userRepo.save(createdUser);
+    const role = await this.roleRepo.findOne({
+      where: { role_name: role_name.PATIENT },
+    });
+    if (!role) {
+      throw new NotFoundException('Mặc đinh role Patient không tồn tại !');
+    }
+    this.userRoleRepo.save({
+      user: newUser,
+      role,
+    });
+    return newUser;
   }
 
   async updateUserField(
